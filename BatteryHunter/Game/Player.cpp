@@ -17,6 +17,15 @@ Player::Player()
 
 	//キャラコンを初期化
 	characterController.Init(25.0f, 75.0f, position);
+
+	//初期化
+	m_playerBattery = 100;
+	m_playerBatteryMax = 100;
+
+	m_hasCoreBattery = false;
+	m_isEscape = false;
+	m_isDead = false;
+
 }
 
 Player::~Player()
@@ -31,6 +40,12 @@ void Player::Update()
 	Rotation();           //回転処理
 	ManageState();	      //ステート管理
 	PlayAnimation();      //アニメーションの再生
+
+	//バッテリー切れ
+	if (m_playerBattery <= 0) {
+		m_playerBattery = 0;
+		m_isDead = true;
+	}
 	modelRender.Update(); //絵描きさんの更新処理
 }
 //移動処理
@@ -142,6 +157,59 @@ void Player::PlayAnimation()
 	case 1:modelRender.PlayAnimation(enAnimationClip_Jump);break; //1(ジャンプ中)
 	case 2:modelRender.PlayAnimation(enAnimationClip_Walk);break; //2(歩き)
 	case 3:modelRender.PlayAnimation(enAnimationClip_run); break;}//3(走り)
+}
+//バッテリー回復
+void Player::AddBattery(int value) {
+	m_playerBattery += value;
+	//回復量がMaxより大きい場合
+	if (m_playerBattery > m_playerBatteryMax) {
+		m_playerBattery = m_playerBatteryMax;
+	}
+}
+//バッテリー消費
+void Player::ConsumeBattery(int value) {
+	m_playerBattery -= value;
+	//バッテリーが0以下になったら0に調整する
+	if (m_playerBattery < 0) {
+		m_playerBattery = 0;
+	}
+}
+//バッテリ切れ判定
+bool Player::IsBatteryEnpty()const 
+{
+	return m_playerBattery <= 0;
+}
+//ダメージ
+void Player::Damage(int value) 
+{
+	ConsumeBattery(value);
+}
+//コアバッテリー取得
+void Player::GetCoreBattery() 
+{
+	//取得してない場合終了
+	if (m_hasCoreBattery) { return; }
+	m_hasCoreBattery = true;
+	//最大容量増加
+	m_playerBatteryMax = 200;
+	//全回復
+	m_playerBattery = m_playerBatteryMax;
+}
+//弾切り替え
+void Player::NextBullet() 
+{
+	switch (m_bulletType)
+	{
+	case BulletType::Normal:
+		m_bulletType = BulletType::EMP;
+		break;
+	case BulletType::EMP:
+		m_bulletType = BulletType::Drain;
+		break;
+	case BulletType::Drain:
+		m_bulletType = BulletType::Normal;
+		break;
+	}
 }
 //描画処理。
 void Player::Render(RenderContext& rc)
