@@ -43,7 +43,7 @@ private:
 	Vector3 m_direction;       //移動方向
 	float m_speed = 0.0f;      //移動速度
 	float m_lifeTime = 0.0f;   //生存時間(消えるまでの時間)
-	bool m_Active = false;     //有効判定
+	bool m_isActive = false;   //有効判定
 	//弾種類
 	Player::BulletType m_bulletType;
 };

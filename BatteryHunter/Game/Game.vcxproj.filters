@@ -72,6 +72,10 @@
     <ClCompile Include="TextPopup.cpp">
       <Filter>プロジェクト\03_UI</Filter>
     </ClCompile>
+    <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="BulletManager.cpp">
+      <Filter>プロジェクト\06_管理</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="system\system.h">
@@ -112,6 +116,10 @@
     </ClInclude>
     <ClInclude Include="TextPopup.h">
       <Filter>プロジェクト\03_UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.h" />
+    <ClInclude Include="BulletManager.h">
+      <Filter>プロジェクト\06_管理</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

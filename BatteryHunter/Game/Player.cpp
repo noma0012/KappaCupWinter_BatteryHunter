@@ -41,7 +41,7 @@ void Player::Update()
 	Rotation();           //回転処理
 	ManageState();	      //ステート管理
 	PlayAnimation();      //アニメーションの再生
-
+	Shoot();              //射撃処理
 	//バッテリー切れ
 	if (m_playerBattery <= 0) {
 		m_playerBattery = 0;
@@ -224,14 +224,14 @@ void Player::NextBullet()
 //射撃
 void Player::Shoot()
 {
-	if (!g_pad[0]->IsPress(enButtonX)) { return; }
+	if (!g_pad[0]->IsPress(enButtonB)) { return; }
 	if (m_shotTimer > 0.0f) { return; }
 	BulletManager* bulletManager =
 		FindGO<BulletManager>("bulletManager");
 	if (bulletManager == nullptr) { return; }
 	bulletManager->Fire(
 		position,
-		g_camera3D->GetForward(),
+		GetForward(),
 		m_bulletType
 	);
 	m_shotTimer = m_shotInterval;
@@ -247,6 +247,13 @@ void Player::Shoot()
 		ConsumeBattery(3);
 		break;
 	}
+}
+//前方向取得
+Vector3 Player::GetForward() const
+{
+	Vector3 forward = { 0.0f,0.0f,1.0f };
+	rotation.Apply(forward);
+	return forward;
 }
 //描画処理。
 void Player::Render(RenderContext& rc)

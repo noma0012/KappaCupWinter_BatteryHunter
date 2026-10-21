@@ -34,7 +34,7 @@ public:
 	//消費
 	void ConsumeBattery(int value);
 	//空判定
-	bool IsBatteryEnpty() const;
+	bool IsBatteryEmpty() const;
 	//ダメージ
 	void Damage(int value);
 	//コアバッテリー取得
@@ -72,6 +72,8 @@ public:
 	}
 	//プレイヤー座標取得
 	Vector3 GetPosition() const { return position; }
+	//前方向取得
+	Vector3 GetForward()const;
 private:
 	//モデル
 	ModelRender modelRender;

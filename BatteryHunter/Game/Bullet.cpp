@@ -6,7 +6,7 @@
 Bullet::Bullet() 
 {
 	//弾読み込み
-	//m_modelRender.Init();
+	m_modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
 }
 Bullet::~Bullet() 
 {

@@ -17,7 +17,7 @@ public:
 	/// 空いている弾を探して
 	/// 発射する関数
 	///━━━━━━━━━━━━━━━
-	void Fire(
+	bool Fire(
 		const Vector3& pos,
 		const Vector3& dir,
 		Player::BulletType type
