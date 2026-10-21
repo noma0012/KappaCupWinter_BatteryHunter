@@ -144,7 +144,7 @@ void Unit::PushPlayer() {
 	//プレイヤーが存在しない場合は終了
 	if (player == nullptr) { return; }
 	//プレイヤーとの距離ベクトル
-	Vector3 diff = position - player->position;
+	Vector3 diff = position - player->GetPosition();
 	//接触判定距離
 	float limit = radius + playerRadius;
 	//距離の二乗
