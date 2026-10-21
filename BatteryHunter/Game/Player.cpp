@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Player.h"
+#include "BulletManager.h"
 
 Player::Player()
 {
@@ -45,6 +46,15 @@ void Player::Update()
 	if (m_playerBattery <= 0) {
 		m_playerBattery = 0;
 		m_isDead = true;
+	}
+	if (m_shotTimer > 0.0f)
+	{
+		m_shotTimer -= 1.0f / 60.0f;
+	}
+	//弾切り替え
+	if (g_pad[0]->IsTrigger(enButtonY))
+	{
+		NextBullet();
 	}
 	modelRender.Update(); //絵描きさんの更新処理
 }
@@ -175,7 +185,7 @@ void Player::ConsumeBattery(int value) {
 	}
 }
 //バッテリ切れ判定
-bool Player::IsBatteryEnpty()const 
+bool Player::IsBatteryEmpty()const 
 {
 	return m_playerBattery <= 0;
 }
@@ -208,6 +218,33 @@ void Player::NextBullet()
 		break;
 	case BulletType::Drain:
 		m_bulletType = BulletType::Normal;
+		break;
+	}
+}
+//射撃
+void Player::Shoot()
+{
+	if (!g_pad[0]->IsPress(enButtonX)) { return; }
+	if (m_shotTimer > 0.0f) { return; }
+	BulletManager* bulletManager =
+		FindGO<BulletManager>("bulletManager");
+	if (bulletManager == nullptr) { return; }
+	bulletManager->Fire(
+		position,
+		g_camera3D->GetForward(),
+		m_bulletType
+	);
+	m_shotTimer = m_shotInterval;
+	switch (m_bulletType)
+	{
+	case Player::BulletType::Normal:
+		ConsumeBattery(1);
+		break;
+	case Player::BulletType::EMP:
+		ConsumeBattery(5);
+		break;
+	case Player::BulletType::Drain:
+		ConsumeBattery(3);
 		break;
 	}
 }

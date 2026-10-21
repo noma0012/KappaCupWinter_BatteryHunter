@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "UI.h"
 #include "Unit.h"
+#include "BulletManager.h"
 
 //ゲームを管理するクラス
 bool Game::Start()
@@ -37,6 +38,8 @@ bool Game::Start()
 	for (int i = 0; i < 5; i++) {
 		SetUnit(Type::Basic, 1000.0f, 0.0f, 1000.0f);
 	}
+	//弾管理オブジェクト作成
+	NewGO<BulletManager>(0, "bulletManager");
 
 	//画面UI作成(一番下に配置)
 	ui_Ins = NewGO<UI>(0, "ui");

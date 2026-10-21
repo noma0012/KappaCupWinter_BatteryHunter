@@ -95,5 +95,10 @@ private:
 	bool m_isTimeOver = false;     //時間切れ　コア取得後制限時間を超えた場合に使用
 	//現在装備中の弾
 	BulletType m_bulletType = BulletType::Normal;
-
+	//射撃
+	void Shoot();
+	//発射間隔
+	float m_shotInterval = 0.15f;
+	//発射タイマー
+	float m_shotTimer = 0.0f;
 };
