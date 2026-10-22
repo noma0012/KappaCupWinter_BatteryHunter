@@ -7,6 +7,7 @@
 #include "UI.h"
 #include "Unit.h"
 #include "BulletManager.h"
+#include "UnitManager.h"
 
 //ゲームを管理するクラス
 bool Game::Start()
@@ -34,10 +35,14 @@ bool Game::Start()
 	//プレイヤーオブジェクト作成
 	player_Ins = NewGO<Player>(0, "player");
 
+	//ユニット管理クラス作成
+	unitManager_Ins = NewGO<UnitManager>(0, "unitManager");
 	//ユニット作成
 	for (int i = 0; i < 5; i++) {
-		SetUnit(Type::Basic, 1000.0f, 0.0f, 1000.0f);
+		unitManager_Ins->SpawnUnit(Type::Basic, 1000.0f, 0.0f, 1000.0f);
 	}
+
+
 	//弾管理オブジェクト作成
 	NewGO<BulletManager>(0, "bulletManager");
 
@@ -53,7 +58,8 @@ Game::~Game() {
 	DeleteGO(camera_Ins);
 	DeleteGO(player_Ins);
 	DeleteGO(ui_Ins);
-	for (auto unit : unit_Ins) { DeleteGO(unit); }
+	DeleteGO(unitManager_Ins);
+	
 }
 void Game::Update()
 {
@@ -64,26 +70,6 @@ void Game::Update()
 
 		//自身を削除(Game)
 		DeleteGO(this);
-	}
-}
-//ユニット作成共通関数
-void Game::SetUnit(Type type, float x, float y, float z) {
-	auto unit = NewGO<Unit>(0, "unit");
-	unit->SetUp(type, x, y, z);
-	unit_Ins.push_back(unit);
-}
-//ユニット索敵関数
-void Game::RemoveUnit(Unit* unit)
-{
-	auto it = std::find(
-		unit_Ins.begin(),
-		unit_Ins.end(),
-		unit
-	);
-
-	if (it != unit_Ins.end())
-	{
-		unit_Ins.erase(it);
 	}
 }
 void Game::Render(RenderContext& rc)

@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Game.h"
 #include "UI.h"
+#include "UnitManager.h"
 
 //ユニットを管理するクラス
 //初期設定
@@ -113,8 +114,8 @@ void Unit::Move() {
 //ユニット押し出し処理
 void Unit::PushUnit() {
 	//全ユニットをチェック
-	auto game = FindGO<Game>("game");
-	for (auto other : game->unit_Ins) {
+	auto unitManager = FindGO<UnitManager>("unitManager");
+	for (auto other : unitManager->GetUnits()) {
 		if (other == this) { continue; }//自分自身は除外
 		//相手との距離ベクトル
 		Vector3 diff = position - other->position;

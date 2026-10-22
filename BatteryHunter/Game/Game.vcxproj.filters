@@ -28,6 +28,12 @@
     <Filter Include="プロジェクト\06_管理">
       <UniqueIdentifier>{b4874f91-869d-4b29-be40-480c004f7d73}</UniqueIdentifier>
     </Filter>
+    <Filter Include="プロジェクト\07_その他">
+      <UniqueIdentifier>{d0f00e45-ee59-4cb3-a68b-3aeb576ac7e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="プロジェクト\07_その他\01_武器">
+      <UniqueIdentifier>{8203c66b-ba3f-4c30-9924-093745ad34c9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="system\system.cpp">
@@ -72,9 +78,20 @@
     <ClCompile Include="TextPopup.cpp">
       <Filter>プロジェクト\03_UI</Filter>
     </ClCompile>
-    <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="BulletManager.cpp">
       <Filter>プロジェクト\06_管理</Filter>
+    </ClCompile>
+    <ClCompile Include="AttackData.cpp">
+      <Filter>プロジェクト\06_管理</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitManager.cpp">
+      <Filter>プロジェクト\06_管理</Filter>
+    </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>プロジェクト\07_その他\01_武器</Filter>
+    </ClCompile>
+    <ClCompile Include="Weapon.cpp">
+      <Filter>プロジェクト\07_その他\01_武器</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -117,9 +134,20 @@
     <ClInclude Include="TextPopup.h">
       <Filter>プロジェクト\03_UI</Filter>
     </ClInclude>
-    <ClInclude Include="Bullet.h" />
     <ClInclude Include="BulletManager.h">
       <Filter>プロジェクト\06_管理</Filter>
+    </ClInclude>
+    <ClInclude Include="AttackData.h">
+      <Filter>プロジェクト\06_管理</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitManager.h">
+      <Filter>プロジェクト\06_管理</Filter>
+    </ClInclude>
+    <ClInclude Include="Weapon.h">
+      <Filter>プロジェクト\07_その他\01_武器</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.h">
+      <Filter>プロジェクト\07_その他\01_武器</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

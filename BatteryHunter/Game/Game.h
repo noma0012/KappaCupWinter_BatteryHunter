@@ -9,6 +9,7 @@ class BackGround;
 class GameCamera;
 class GameClear;
 class UI;
+class UnitManager;
 
 class Game : public IGameObject
 {
@@ -20,9 +21,7 @@ public:
 	void Render(RenderContext& rc);
 	void SetUnit(Type type, float x, float y, float z);
 	void RemoveUnit(Unit* unit);
-
-	//ユニットインスタンス
-	vector<Unit*>unit_Ins;
+	
 private:
 
 	ModelRender m_modelRender;
@@ -34,5 +33,6 @@ private:
 	Player*     player_Ins;
 	UI*         ui_Ins;
 	GameClear* gameclear_Ins;
+	UnitManager* unitManager_Ins;
 };
 
