@@ -55,19 +55,40 @@ Unit::~Unit() {
 //更新処理
 void Unit::Update() {
 
-	if (ui == nullptr)
+	if (ui == nullptr){ ui = FindGO<UI>("ui"); }
+	switch (status)
 	{
-		ui = FindGO<UI>("ui");
+	case Status::Normal:
+		Direction(); //方向処理
+		Move();      //移動処理
+		break;
+	case Status::SelfRepair:
+		modelRender.SetScale(Vector3(1.2f, 1.2f, 1.2f));
+		
+		SelfRepair();
+		break;
+	case Status::Stop:
+		//機能停止
+		break;
+	case Status::Charging:
+		break;
+	case Status::Repairing:
+		break;
+	default:
+		break;
 	}
 
-	Direction(); //方向処理
-	Move();      //移動処理
 	PushUnit();  //ユニット押し出し処理
 	PushPlayer();//プレイヤー押し出し処理
 
+	//仮(不必要・テスト)
 	if (GetAsyncKeyState('1') & 0x0001)
 	{
 		TakeDamage(10);
+	}
+	if (GetAsyncKeyState('2') & 0x0001)
+	{
+		status = Status::SelfRepair;
 	}
 
 	//回転更新
@@ -175,9 +196,12 @@ void Unit::TakeDamage(int damage)
 	if (hp <= 0)
 	{
 		hp = 0;
-		auto manager =
-			FindGO<UnitManager>("unitManager");
-		manager->RemoveUnit(this);
+		//auto manager =
+		//	FindGO<UnitManager>("unitManager");
+		//manager->RemoveUnit(this);
+
+		//自己修復状態へ
+		status = Status::SelfRepair;
 		return;
 	}
 	Vector3 popupPos = position;
@@ -189,6 +213,35 @@ void Unit::TakeDamage(int damage)
 		damage,
 		popupPos
 	);
+}
+//自己修復
+void Unit::SelfRepair()
+{
+	//一秒計測
+	selfRepairTimer += g_gameTime->GetFrameDeltaTime();
+	if (selfRepairTimer >= 1.0f)
+	{
+		selfRepairTimer = 0.0f;
+
+		//HP回復
+		hp += 5;
+
+		//バッテリー消費
+		battery -= 0.5f;
+	}
+
+	//バッテリー切れ
+	if (battery <= 0.0f) {
+		battery = 0.0f;
+		status = Status::Stop;
+		return;
+	}
+	//修復完了
+	if (hp >= 100)
+	{
+		hp = 100;
+		status = Status::Normal;
+	}
 }
 //描画処理
 void Unit::Render(RenderContext& rc)

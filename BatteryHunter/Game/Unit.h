@@ -16,8 +16,13 @@ enum class Type { //種類
 	Boss,      //ボス
 	Max
 };
-enum class Status { //状態
-	
+//状態
+enum class Status { 
+	Normal,     //通常
+	SelfRepair, //自己修復中
+	Stop,       //機能停止
+	Charging,   //充電中
+	Repairing   //修理中
 };
 
 class Unit : public IGameObject
@@ -30,8 +35,9 @@ public:
 
 	void SetUp(Type type, float x, float y, float z);//初期設定
 	void TakeDamage(int damage);
-	float GetRadius()const { return radius; }
-	Vector3 GetPosition()const { return position; }
+	float GetRadius()const { return radius; }//方向取得
+	Vector3 GetPosition()const { return position; }//座標取得
+	Status GetStatus()const { return status; }//状態取得
 private:
 	void Update();                  //更新処理
 	void Render(RenderContext& rc); //描画処理
@@ -39,6 +45,7 @@ private:
 	void Move();                    //移動処理
 	void PushUnit();  //ユニット押し出し処理
 	void PushPlayer();//プレイヤー押し出し処理
+	void SelfRepair();//自己修復
 	//Vector3
 	Vector3 position;      //位置(ユニット)
 	Vector3 direction;     //方向(Vector3)
@@ -55,6 +62,10 @@ private:
 
 	Weapon weapon;
 	int hp = 100;
+	float battery = 100.0f;//バッテリー残量
+	float selfRepairTimer = 0.0f;//自己修復タイマー
+	Status status = Status::Normal;//状態
+
 
 	Player* player = nullptr;
 	UI* ui;
