@@ -171,11 +171,19 @@ void Unit::PushPlayer() {
 //ダメージ処理
 void Unit::TakeDamage(int damage)
 {
-	Vector3 popupPos;
+	hp -= damage;
+	if (hp <= 0)
+	{
+		hp = 0;
+		auto manager =
+			FindGO<UnitManager>("unitManager");
+		manager->RemoveUnit(this);
+		return;
+	}
+	Vector3 popupPos = position;
 
-	popupPos.x = position.x;
-	popupPos.y = position.z;
-	popupPos.z = 0.0f;
+	//頭上へ表示
+	popupPos.y += 100.0f;
 
 	ui->CreateDamagePopup(
 		damage,

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Bullet.h"
 #include "Player.h"
+#include "UnitManager.h"
 
 //弾を管理するクラス
 Bullet::Bullet() 
@@ -48,6 +49,25 @@ void Bullet::Update()
 	{
 		m_isActive = false;
 		return;
+	}
+
+	auto unitManager = FindGO<UnitManager>("unitManager");
+
+	if (unitManager)
+	{
+		for (auto unit : unitManager->GetUnits())
+		{
+			Vector3 diff =
+				unit->GetPosition() - m_position;
+			float limit =
+				unit->GetRadius() + m_radius;
+			if (diff.LengthSq() < limit * limit)
+			{
+				unit->TakeDamage(10);
+				m_isActive = false;
+				break;
+			}
+		}
 	}
 	//座標更新
 	m_modelRender.SetPosition(m_position);

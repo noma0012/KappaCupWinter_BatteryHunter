@@ -178,12 +178,16 @@ void TextPopup::Update(float deltaTime)
 
     if (m_layer == PopupLayer::World)
     {
-        // カメラ実装後に使用
-        //
-        // drawPosition =
-        //     g_camera->WorldToScreen(
-        //         drawPosition
-        //     );
+        Vector2 screenPos;
+
+        g_camera3D->CalcScreenPositionFromWorldPosition(
+            screenPos,
+            m_position
+        );
+        drawPosition.x = screenPos.x;
+        drawPosition.y = screenPos.y;
+        drawPosition.z = 0.0f;
+
     }
 
     //----------------------------------------

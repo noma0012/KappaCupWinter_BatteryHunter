@@ -64,25 +64,6 @@ void UI::SetTime()
 {
     remain = max(0,(int)duration<float>(steady_clock::now() - startTime).count());
 
-    //------------------------
-    // 5秒ごとに表示
-    //------------------------
-
-    static int oldTime = -1;
-
-    if (remain != oldTime)
-    {
-        oldTime = remain;
-
-        if (remain % 1 == 0)
-        {
-            m_textPopupManager.CreateDamage(
-                100,
-                Vector3(0.0f, 0.0f, 0.0f)
-            );
-        }
-    }
-
     //一時間になったら終了状態にする
     if (remain == 3600 && !Finished) { Finished = true; }
 

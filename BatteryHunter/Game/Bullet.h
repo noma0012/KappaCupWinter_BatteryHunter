@@ -44,6 +44,7 @@ private:
 	float m_speed = 0.0f;      //移動速度
 	float m_lifeTime = 0.0f;   //生存時間(消えるまでの時間)
 	bool m_isActive = false;   //有効判定
+	float m_radius = 20.0f;    //当たり判定
 	//弾種類
 	Player::BulletType m_bulletType;
 };

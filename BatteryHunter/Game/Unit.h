@@ -30,6 +30,8 @@ public:
 
 	void SetUp(Type type, float x, float y, float z);//初期設定
 	void TakeDamage(int damage);
+	float GetRadius()const { return radius; }
+	Vector3 GetPosition()const { return position; }
 private:
 	void Update();                  //更新処理
 	void Render(RenderContext& rc); //描画処理
@@ -52,6 +54,7 @@ private:
 	CharacterController characterController;
 
 	Weapon weapon;
+	int hp = 100;
 
 	Player* player = nullptr;
 	UI* ui;
