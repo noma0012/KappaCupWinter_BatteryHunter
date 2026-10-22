@@ -5,7 +5,7 @@ class BulletManager:public IGameObject
 {
 public:
 	//最大弾数
-	static const int MAX_BULLET = 300;
+	static const int MAX_BULLET = 100;
 public:
 	BulletManager();
 	~BulletManager();

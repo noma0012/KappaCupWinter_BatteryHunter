@@ -1,4 +1,5 @@
 #pragma once
+#include "Weapon.h"
 
 using namespace std;
 
@@ -49,6 +50,8 @@ private:
 	Quaternion rotation;        //ユニット回転
 	PhysicsStaticObject physicsStaticObject;
 	CharacterController characterController;
+
+	Weapon weapon;
 
 	Player* player = nullptr;
 	UI* ui;

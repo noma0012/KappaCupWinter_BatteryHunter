@@ -20,7 +20,7 @@ public:
     //----------------------------------------
 
     /// 最大ポップアップ数
-    static const int MAX_POPUP = 200;
+    static const int MAX_POPUP = 100;
 
 public:
 
