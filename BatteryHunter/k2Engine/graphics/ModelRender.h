@@ -288,6 +288,10 @@ namespace nsK2Engine {
 		void SetRaytracingWorld(bool flag) {
 			m_isRaytracingWorld = flag;
 		}
+		/// <summary>
+		/// レイトレーシングワールドから削除
+		/// </summary>
+		void RemoveFromRaytracingWorld();
 	private:
 		/// <summary>
 		/// スケルトンの初期化。

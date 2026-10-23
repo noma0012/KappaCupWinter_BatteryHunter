@@ -47,6 +47,7 @@ void Bullet::Update()
 	//寿命切れ
 	if (m_lifeTime <= 0.0f)
 	{
+		m_modelRender.RemoveFromRaytracingWorld();
 		m_isActive = false;
 		return;
 	}
@@ -64,8 +65,9 @@ void Bullet::Update()
 			if (diff.LengthSq() < limit * limit)
 			{
 				unit->TakeDamage(10);
+				m_modelRender.RemoveFromRaytracingWorld();
 				m_isActive = false;
-				break;
+				return;
 			}
 		}
 	}

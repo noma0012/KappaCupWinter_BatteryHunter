@@ -64,8 +64,9 @@ private:
 	int hp = 100;
 	float battery = 100.0f;//バッテリー残量
 	float selfRepairTimer = 0.0f;//自己修復タイマー
+	float stopTimer = 0.0f;//機能停止タイマー
 	Status status = Status::Normal;//状態
-
+	
 
 	Player* player = nullptr;
 	UI* ui;

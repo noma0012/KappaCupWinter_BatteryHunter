@@ -50,25 +50,54 @@ Unit::Unit() {
 	ui = FindGO<UI>("ui");
 }
 Unit::~Unit() {
-
+	MessageBoxA(
+		NULL,
+		"Unit Delete",
+		"DEBUG",
+		MB_OK
+	);
 }
 //更新処理
 void Unit::Update() {
 
 	if (ui == nullptr){ ui = FindGO<UI>("ui"); }
+
+	//重力
+	if (characterController.IsOnGround()) {
+		position.y = 0.0f;
+	}
+	else {
+		position.y -= 2.5f;
+	}
+
 	switch (status)
 	{
 	case Status::Normal:
+		//元に戻す
+		modelRender.SetScale(Vector3(1.0f, 1.0f, 1.0f));
 		Direction(); //方向処理
 		Move();      //移動処理
 		break;
 	case Status::SelfRepair:
+		//少し大きくする
 		modelRender.SetScale(Vector3(1.2f, 1.2f, 1.2f));
 		
 		SelfRepair();
 		break;
 	case Status::Stop:
 		//機能停止
+		//タイマー加算
+		stopTimer += g_gameTime->GetFrameDeltaTime();
+
+		if (stopTimer >= 60.0f)
+		{
+			//ドロップ
+			//消滅
+			auto manager = FindGO<UnitManager>("unitManager");
+			manager->RemoveUnit(this);
+			return;
+		}
+
 		break;
 	case Status::Charging:
 		break;
@@ -89,6 +118,17 @@ void Unit::Update() {
 	if (GetAsyncKeyState('2') & 0x0001)
 	{
 		status = Status::SelfRepair;
+	}
+	if (GetAsyncKeyState('3') & 0x0001)
+	{
+		battery = 0.0f;
+	}
+	
+	//バッテリー切れ
+	if (battery <= 0.0f)
+	{
+		battery = 0.0f;
+		status = Status::Stop;
 	}
 
 	//回転更新
@@ -124,13 +164,8 @@ void Unit::Move() {
 	if (distance >50.0f) {
 		position += direction * 4.0f;
 	}
-	//重力
-	if (characterController.IsOnGround()) {
-		position.y = 0.0f;
-	}
-	else {
-		position.y -= 2.5f;
-	}
+	//移動(電力消費)
+	battery -= 0.4f * g_gameTime->GetFrameDeltaTime();
 }
 //ユニット押し出し処理
 void Unit::PushUnit() {
