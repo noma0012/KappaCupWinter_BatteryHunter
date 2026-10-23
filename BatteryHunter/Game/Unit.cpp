@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "UI.h"
 #include "UnitManager.h"
+#include "BatteryItem.h"
 
 //ユニットを管理するクラス
 //初期設定
@@ -50,12 +51,7 @@ Unit::Unit() {
 	ui = FindGO<UI>("ui");
 }
 Unit::~Unit() {
-	MessageBoxA(
-		NULL,
-		"Unit Delete",
-		"DEBUG",
-		MB_OK
-	);
+
 }
 //更新処理
 void Unit::Update() {
@@ -92,6 +88,9 @@ void Unit::Update() {
 		if (stopTimer >= 60.0f)
 		{
 			//ドロップ
+			BatteryItem* item = NewGO<BatteryItem>(0, "battery");
+			item->SetPosition(position);
+			item->SetRotation(rotation);
 			//消滅
 			auto manager = FindGO<UnitManager>("unitManager");
 			manager->RemoveUnit(this);

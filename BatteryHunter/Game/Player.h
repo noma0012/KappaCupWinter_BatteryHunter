@@ -74,6 +74,11 @@ public:
 	Vector3 GetPosition() const { return position; }
 	//前方向取得
 	Vector3 GetForward()const;
+	void AddBattery(float value);//バッテリー回復
+
+	//バッテリー
+	float m_playerBattery = 100.0f;     //バッテリー残量
+	float m_playerBatteryMax = 100.0f;  //バッテリー容量
 private:
 	//モデル
 	ModelRender modelRender;
@@ -87,9 +92,6 @@ private:
 	CharacterController characterController;            //キャラクターコントローラー。
 		                            
 	int playerState = 0;                                //プレイヤーのステート(状態)を表す変数。
-	//バッテリー
-	int m_playerBattery = 100;     //バッテリー残量
-	int m_playerBatteryMax = 100;  //バッテリー容量
 	//条件
 	bool m_hasCoreBattery = false; //コア所持
 	bool m_isEscape = false;       //脱出済み

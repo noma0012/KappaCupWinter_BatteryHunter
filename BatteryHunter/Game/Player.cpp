@@ -238,13 +238,13 @@ void Player::Shoot()
 	switch (m_bulletType)
 	{
 	case Player::BulletType::Normal:
-		ConsumeBattery(1);
+		ConsumeBattery(0.1);
 		break;
 	case Player::BulletType::EMP:
-		ConsumeBattery(5);
+		ConsumeBattery(0.5);
 		break;
 	case Player::BulletType::Drain:
-		ConsumeBattery(3);
+		ConsumeBattery(0.3);
 		break;
 	}
 }
@@ -254,6 +254,15 @@ Vector3 Player::GetForward() const
 	Vector3 forward = { 0.0f,0.0f,1.0f };
 	rotation.Apply(forward);
 	return forward;
+}
+//バッテリー回復処理
+void Player::AddBattery(float value)
+{
+	m_playerBattery += value;
+	if (m_playerBattery > m_playerBatteryMax)
+	{
+		m_playerBattery = m_playerBatteryMax;
+	}
 }
 //描画処理。
 void Player::Render(RenderContext& rc)

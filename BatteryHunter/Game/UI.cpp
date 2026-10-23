@@ -83,13 +83,11 @@ void UI::SetBattery() {
     for (int i = 0; i < 3; i++) { Line[i].SetText(L"|"); }
 
     //初期バッテリーサイズ
-    static float playerBattery = 100.0f;
     static float bossBattery = 100.0f;
     //減少速度
-    playerBattery -= 0.05f;
     bossBattery -= 0.01f;
     //サイズ設定
-    Battery[B_Player].SetRate(playerBattery / 100.0f);
+    Battery[B_Player].SetRate(player->m_playerBattery / player->m_playerBatteryMax);
     Battery[B_Boss].SetRate(bossBattery / 100.0f);
     //更新処理
     Battery[B_Player].Update();

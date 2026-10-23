@@ -34,6 +34,9 @@
     <Filter Include="プロジェクト\07_その他\01_武器">
       <UniqueIdentifier>{8203c66b-ba3f-4c30-9924-093745ad34c9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="プロジェクト\07_その他\02_バッテリー">
+      <UniqueIdentifier>{2048bc02-8fa5-4349-85ca-0b186ab168da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="system\system.cpp">
@@ -93,6 +96,9 @@
     <ClCompile Include="Weapon.cpp">
       <Filter>プロジェクト\07_その他\01_武器</Filter>
     </ClCompile>
+    <ClCompile Include="BatteryItem.cpp">
+      <Filter>プロジェクト\07_その他\02_バッテリー</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="system\system.h">
@@ -148,6 +154,9 @@
     </ClInclude>
     <ClInclude Include="Bullet.h">
       <Filter>プロジェクト\07_その他\01_武器</Filter>
+    </ClInclude>
+    <ClInclude Include="BatteryItem.h">
+      <Filter>プロジェクト\07_その他\02_バッテリー</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
