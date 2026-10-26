@@ -5,8 +5,10 @@
 //バッテリーを管理するクラス
 BatteryItem::BatteryItem() 
 {
-	//modelRender.Init("Assets/modelData/Battery/NormalBattery.tkm");
-	modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
+	//通常バッテリー読み込み
+	modelRender.Init("Assets/modelData/Battery/normal_battery.tkm");
+	//コアバッテリー読み込み
+	//modelRender.Init("Assets/modelData/Battery/core_battery.tkm");
 
 	player = FindGO<Player>("player");
 }
