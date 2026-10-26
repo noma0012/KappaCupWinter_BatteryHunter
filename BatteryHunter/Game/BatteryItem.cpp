@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "BatteryItem.h"
 #include "Player.h"
+#include "UI.h"
 
 //バッテリーを管理するクラス
 BatteryItem::BatteryItem() 
@@ -11,6 +12,7 @@ BatteryItem::BatteryItem()
 	//modelRender.Init("Assets/modelData/Battery/core_battery.tkm");
 
 	player = FindGO<Player>("player");
+	ui = FindGO<UI>("ui");
 }
 
 BatteryItem::~BatteryItem()
@@ -41,8 +43,13 @@ void BatteryItem::Update()
 	//取得判定
 	if (distanceSq < limit + limit)
 	{
+		int Heal = 10;
 		//回復
-		player->AddBattery(10);
+		player->AddBattery(Heal);
+		ui->CreateHealPopup(
+			Heal,
+			player->GetPosition()
+		);
 		DeleteGO(this);
 		return;
 	}

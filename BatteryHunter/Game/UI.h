@@ -35,13 +35,10 @@ public:
     bool Finished;//終了状態
 
 public:
-    /// <summary>
-    /// ダメージ表示
-    /// </summary>
-    void CreateDamagePopup(
-        int damage,
-        const Vector3& pos
-    );
+    //ダメージ表示
+    void CreateDamagePopup(int damage, const Vector3& pos);
+    //回復表示
+    void CreateHealPopup(int Heal, const Vector3& pos);
 private:
     steady_clock::time_point startTime;//開始時間
     int remain;//現在の時間

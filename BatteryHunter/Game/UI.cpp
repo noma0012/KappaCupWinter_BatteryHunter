@@ -101,6 +101,14 @@ void UI::CreateDamagePopup(int damage,const Vector3& pos)
         pos
     );
 }
+//回復ポップアップ生成管理
+void UI::CreateHealPopup(int Heal, const Vector3& pos)
+{
+    m_textPopupManager.CreateHeal(
+        Heal,
+        pos
+    );
+}
 //描画管理
 void UI::Render(RenderContext& rc)
 {

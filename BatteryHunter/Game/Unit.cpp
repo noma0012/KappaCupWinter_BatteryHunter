@@ -230,9 +230,6 @@ void Unit::TakeDamage(int damage)
 	if (hp <= 0)
 	{
 		hp = 0;
-		//auto manager =
-		//	FindGO<UnitManager>("unitManager");
-		//manager->RemoveUnit(this);
 
 		//自己修復状態へ
 		status = Status::SelfRepair;

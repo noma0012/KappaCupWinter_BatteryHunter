@@ -1,6 +1,7 @@
 #pragma once
 
 class Player;
+class UI;
 
 class BatteryItem:public IGameObject
 {
@@ -21,5 +22,6 @@ private:
 	float radius = 30.0f;
 
 	Player* player = nullptr;
+	UI* ui = nullptr;
 };
 
