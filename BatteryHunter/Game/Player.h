@@ -30,9 +30,9 @@ public:
 	void PlayAnimation();//アニメーションの再生
 	//バッテリー
 	//回復
-	void AddBattery(int value);
+	void AddBattery(float value);
 	//消費
-	void ConsumeBattery(int value);
+	void ConsumeBattery(float value);
 	//空判定
 	bool IsBatteryEmpty() const;
 	//ダメージ
@@ -63,18 +63,17 @@ public:
 		return m_isDead;
 	}
 	//現在バッテリー取得
-	int GetBattery()const {
+	float GetBattery()const {
 		return m_playerBattery;
 	}
 	//最大バッテリー取得
-	int GetBatteryMax() const {
+	float GetBatteryMax() const {
 		return m_playerBatteryMax;
 	}
 	//プレイヤー座標取得
 	Vector3 GetPosition() const { return position; }
 	//前方向取得
 	Vector3 GetForward()const;
-	void AddBattery(float value);//バッテリー回復
 
 	//バッテリー
 	float m_playerBattery = 100.0f;     //バッテリー残量

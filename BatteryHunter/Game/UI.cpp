@@ -17,6 +17,7 @@ UI::UI()
     //座標設定
     font[Time].SetPosition({ -44.0f, 520.0f,0.0f });       //時間
     font[PlayerPos].SetPosition({ -900.0f, 460.0f,0.0f }); //プレイヤー座標
+    font[PlayerBattery].SetPosition({ -550.0f,-380.0f,0.0f });//プレイヤー電力残量
     //表示する色を設定する。
     font[Time].SetColor(g_vec4White);
 
@@ -86,9 +87,16 @@ void UI::SetBattery() {
     static float bossBattery = 100.0f;
     //減少速度
     bossBattery -= 0.01f;
+
+
     //サイズ設定
-    Battery[B_Player].SetRate(player->m_playerBattery / player->m_playerBatteryMax);
+    Battery[B_Player].SetRate(player->GetBattery() / player->GetBatteryMax());
     Battery[B_Boss].SetRate(bossBattery / 100.0f);
+
+    //電力残量表示
+    swprintf_s(buffer[PlayerBattery], 32, L"%.1f", player->GetBattery());
+    font[PlayerBattery].SetText(buffer[PlayerBattery]);
+
     //更新処理
     Battery[B_Player].Update();
     Battery[B_Boss].Update();
@@ -112,9 +120,7 @@ void UI::CreateHealPopup(int Heal, const Vector3& pos)
 //描画管理
 void UI::Render(RenderContext& rc)
 {
-    font[Time].Draw(rc);
-    font[PlayerPos].Draw(rc);
-
+    for (int i = 0; i < MaxUI; i++) { font[i].Draw(rc); }
     for (int i = 0; i < B_Max; i++) { Battery[i].Draw(rc); }
     for (int i = 0; i < 3; i++)     { Line[i].Draw(rc); }
 

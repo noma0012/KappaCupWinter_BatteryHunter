@@ -13,9 +13,10 @@ public:
     enum UITopic {
         Time,      //時間
         PlayerPos, //プレイヤー位置座標
+        PlayerBattery,//プレイヤー電力残量
         MaxUI
     };
-    //UI用バッテリー
+    //UIゲージ用バッテリー
     enum UIBattery {
         B_Player,
         B_Boss,

@@ -169,7 +169,7 @@ void Player::PlayAnimation()
 	case 3:modelRender.PlayAnimation(enAnimationClip_run); break;}//3(走り)
 }
 //バッテリー回復
-void Player::AddBattery(int value) {
+void Player::AddBattery(float value) {
 	m_playerBattery += value;
 	//回復量がMaxより大きい場合
 	if (m_playerBattery > m_playerBatteryMax) {
@@ -177,7 +177,7 @@ void Player::AddBattery(int value) {
 	}
 }
 //バッテリー消費
-void Player::ConsumeBattery(int value) {
+void Player::ConsumeBattery(float value) {
 	m_playerBattery -= value;
 	//バッテリーが0以下になったら0に調整する
 	if (m_playerBattery < 0) {
@@ -254,15 +254,6 @@ Vector3 Player::GetForward() const
 	Vector3 forward = { 0.0f,0.0f,1.0f };
 	rotation.Apply(forward);
 	return forward;
-}
-//バッテリー回復処理
-void Player::AddBattery(float value)
-{
-	m_playerBattery += value;
-	if (m_playerBattery > m_playerBatteryMax)
-	{
-		m_playerBattery = m_playerBatteryMax;
-	}
 }
 //描画処理。
 void Player::Render(RenderContext& rc)
