@@ -8,6 +8,7 @@
 #include "Unit.h"
 #include "BulletManager.h"
 #include "UnitManager.h"
+#include "BatteryManager.h"
 
 //ゲームを管理するクラス
 bool Game::Start()
@@ -45,7 +46,8 @@ bool Game::Start()
 
 	//弾管理オブジェクト作成
 	NewGO<BulletManager>(0, "bulletManager");
-
+	//バッテリー管理オブジェクト作成
+	NewGO<BatteryManager>(0, "batteryManager");
 	//画面UI作成(一番下に配置)
 	ui_Ins = NewGO<UI>(0, "ui");
 	return true;

@@ -56,6 +56,7 @@ private:
 	float playerRadius = 30.0f; //プレイヤーの当たり判定半径
 	//その他
 	ModelRender modelRender;    //ユニット
+	ModelRender StopModel;      //機能停止ユニット
 	Quaternion rotation;        //ユニット回転
 	PhysicsStaticObject physicsStaticObject;
 	CharacterController characterController;

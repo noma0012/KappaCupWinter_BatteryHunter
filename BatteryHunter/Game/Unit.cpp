@@ -4,7 +4,7 @@
 #include "Game.h"
 #include "UI.h"
 #include "UnitManager.h"
-#include "BatteryItem.h"
+#include "BatteryManager.h"
 
 //ユニットを管理するクラス
 //初期設定
@@ -37,7 +37,7 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 		modelRender.Init("Assets/modelData/Unit/Unit_Enemy_Boss.tkm");
 		break;
 	}
-
+	StopModel.Init("Assets/modelData/Unit/Unit_Enemy_Stop.tkm");
 	modelRender.SetPosition(position);//座標設定
 	modelRender.Update();             //更新処理
 	//当たり判定
@@ -88,9 +88,11 @@ void Unit::Update() {
 		if (stopTimer >= 60.0f)
 		{
 			//ドロップ
-			BatteryItem* item = NewGO<BatteryItem>(0, "battery");
-			item->SetPosition(position);
-			item->SetRotation(rotation);
+			auto batteryManager = FindGO<BatteryManager>("batteryManager");
+			if (batteryManager)
+			{
+				batteryManager->SpawnBattery(position, rotation);
+			}
 			//消滅
 			auto manager = FindGO<UnitManager>("unitManager");
 			manager->RemoveUnit(this);
@@ -105,7 +107,6 @@ void Unit::Update() {
 	default:
 		break;
 	}
-
 	PushUnit();  //ユニット押し出し処理
 	PushPlayer();//プレイヤー押し出し処理
 
@@ -130,10 +131,12 @@ void Unit::Update() {
 		status = Status::Stop;
 	}
 
-	//回転更新
-	modelRender.SetRotation(rotation);
-	//位置更新
-	modelRender.SetPosition(position);
+	//通常モデル
+	modelRender.SetRotation(rotation);//回転更新
+	modelRender.SetPosition(position);//位置更新
+	//機能停止モデル
+	StopModel.SetRotation(rotation);
+	StopModel.SetPosition(position);
 	//当たり判定の追従
 	physicsStaticObject.Release();
 	physicsStaticObject.CreateFromModel(
@@ -142,6 +145,7 @@ void Unit::Update() {
 	);
 	//モデル更新
 	modelRender.Update();
+	StopModel.Update();
 }
 //方向処理
 void Unit::Direction() {
@@ -277,5 +281,12 @@ void Unit::SelfRepair()
 //描画処理
 void Unit::Render(RenderContext& rc)
 {
-	modelRender.Draw(rc); //ユニット
+	if (status == Status::Stop)
+	{
+		StopModel.Draw(rc);//機能停止ユニット
+	}
+	else 
+	{
+		modelRender.Draw(rc); //ユニット
+	}
 }

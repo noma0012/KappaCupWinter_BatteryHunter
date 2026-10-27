@@ -41,21 +41,25 @@ void Player::Update()
 	Rotation();           //回転処理
 	ManageState();	      //ステート管理
 	PlayAnimation();      //アニメーションの再生
-	Shoot();              //射撃処理
+
+
+	//バッテリー有り
+	if (m_playerBattery > 0)
+	{
+		//射撃間隔
+		if (m_shotTimer > 0.0f){ m_shotTimer -= 1.0f / 60.0f; }
+		//弾切り替え
+		if (g_pad[0]->IsTrigger(enButtonY)){ NextBullet(); }
+		//射撃処理
+		Shoot();
+	}
+	
 	//バッテリー切れ
 	if (m_playerBattery <= 0) {
 		m_playerBattery = 0;
 		m_isDead = true;
 	}
-	if (m_shotTimer > 0.0f)
-	{
-		m_shotTimer -= 1.0f / 60.0f;
-	}
-	//弾切り替え
-	if (g_pad[0]->IsTrigger(enButtonY))
-	{
-		NextBullet();
-	}
+
 	modelRender.Update(); //絵描きさんの更新処理
 }
 //移動処理

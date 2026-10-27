@@ -99,6 +99,9 @@
     <ClCompile Include="BatteryItem.cpp">
       <Filter>プロジェクト\07_その他\02_バッテリー</Filter>
     </ClCompile>
+    <ClCompile Include="BatteryManager.cpp">
+      <Filter>プロジェクト\06_管理</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="system\system.h">
@@ -157,6 +160,9 @@
     </ClInclude>
     <ClInclude Include="BatteryItem.h">
       <Filter>プロジェクト\07_その他\02_バッテリー</Filter>
+    </ClInclude>
+    <ClInclude Include="BatteryManager.h">
+      <Filter>プロジェクト\06_管理</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

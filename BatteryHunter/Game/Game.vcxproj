@@ -226,6 +226,7 @@
     <ClCompile Include="AttackData.cpp" />
     <ClCompile Include="BackGround.cpp" />
     <ClCompile Include="BatteryItem.cpp" />
+    <ClCompile Include="BatteryManager.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="BulletManager.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -252,6 +253,7 @@
     <ClInclude Include="AttackData.h" />
     <ClInclude Include="BackGround.h" />
     <ClInclude Include="BatteryItem.h" />
+    <ClInclude Include="BatteryManager.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="BulletManager.h" />
     <ClInclude Include="Game.h" />
