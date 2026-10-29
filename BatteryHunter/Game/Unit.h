@@ -5,6 +5,7 @@ using namespace std;
 
 class Player;
 class UI;
+class UnitManager;
 
 enum class Type { //種類
 	//通常ユニット
@@ -72,5 +73,6 @@ private:
 	Player* player = nullptr;
 	UI* ui;
 	Unit* target = nullptr;
+	UnitManager* unitManager = nullptr;
 };
 

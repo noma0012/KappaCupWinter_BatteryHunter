@@ -45,19 +45,27 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 		modelRender.GetModel(),
 		modelRender.GetModel().GetWorldMatrix()
 	);
-}
-Unit::Unit() {
+
 	player = FindGO<Player>("player");
 	ui = FindGO<UI>("ui");
+	unitManager = FindGO<UnitManager>("unitManager");
 }
-Unit::~Unit() {
+Unit::Unit() 
+{
+
+}
+Unit::~Unit() 
+{
 
 }
 //更新処理
 void Unit::Update() {
-
+	//Plaeyr取得
+	if (player == nullptr) { player = FindGO<Player>("player"); }
+	//UI取得
 	if (ui == nullptr){ ui = FindGO<UI>("ui"); }
-
+	//UnitManager取得
+	if (unitManager == nullptr) { unitManager = FindGO<UnitManager>("unitManager"); }
 	//重力
 	if (characterController.IsOnGround()) {
 		position.y = 0.0f;
@@ -94,8 +102,9 @@ void Unit::Update() {
 				batteryManager->SpawnBattery(position, rotation);
 			}
 			//消滅
-			auto manager = FindGO<UnitManager>("unitManager");
-			manager->RemoveUnit(this);
+			if (unitManager) {
+				unitManager->RemoveUnit(this);
+			}
 			return;
 		}
 
@@ -149,6 +158,7 @@ void Unit::Update() {
 }
 //方向処理
 void Unit::Direction() {
+	if (player == nullptr) { return; }
 	//方向計算
 	direction = player->GetPosition() - position;
 
@@ -171,26 +181,34 @@ void Unit::Move() {
 	battery -= 0.4f * g_gameTime->GetFrameDeltaTime();
 }
 //ユニット押し出し処理
-void Unit::PushUnit() {
-	//全ユニットをチェック
-	auto unitManager = FindGO<UnitManager>("unitManager");
-	for (auto other : unitManager->GetUnits()) {
-		if (other == this) { continue; }//自分自身は除外
+void Unit::PushUnit() 
+{
+	//ユニット管理クラスが存在しない場合
+	if (unitManager == nullptr) { return; }
+
+	//近くのユニットのみ取得( 例：検索範囲 = 200.0f )
+	auto nearUnits = unitManager->GetNearUnits(position, 200.0f);
+	//近距離ユニットのみ処理
+	for (auto other : nearUnits) 
+	{
+		//自分自身は除外
+		if (other == this) { continue; }
 		//相手との距離ベクトル
 		Vector3 diff = position - other->position;
-		//当たり判定半径の合計
+		//接触距離
 		float limit = radius + other->radius;
 		//距離の二乗
 		float distSq = diff.LengthSq();
-		//半径以内なら接触
-		if (distSq < limit * limit) {
-			//実際の距離
-			float dist = sqrtf(distSq);
+		//接触判定
+		if (distSq < limit * limit)
+		{
 			//ゼロ除算防止
-			if (dist > 0.01f) {
-				//方向ベクトルを正規化
-				diff.Normalize();
-				//めり込んだ量
+			if (distSq > 0.0001f)
+			{
+				float dist = sqrtf(distSq);
+				//方向を正規化
+				diff /= dist;
+				//押し出し量
 				float push = (limit - dist) * 0.5f;
 				//お互い半分ずつ押し出す
 				position += diff * push;
