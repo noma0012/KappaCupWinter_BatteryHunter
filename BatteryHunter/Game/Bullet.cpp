@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Bullet.h"
 #include "Player.h"
+#include "Unit.h"
 #include "UnitManager.h"
 
 //弾を管理するクラス

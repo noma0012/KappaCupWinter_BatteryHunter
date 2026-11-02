@@ -1,5 +1,47 @@
 #pragma once
-#include "Unit.h"
+class Unit;
+
+/// <summary>
+/// ユニット性能データ
+/// </summary>
+struct UnitParam
+{
+	//ステータス
+	int hp;
+	float battery;
+	///索敵範囲
+	float searchRange;
+	///攻撃
+	float attackRange;
+	float attackInterval;
+	int attackPower;
+	///移動速度
+	float moveSpeed;
+	//消費
+	float moveBatteryCost;
+	float attackBatteryCost;
+	float selfRepairBatteryCost;
+
+};
+
+enum class Type { //種類
+	//通常ユニット
+	Basic,     //基本ユニット
+	Charger,   //充電ユニット
+	//特殊ユニット
+	Repair,    //修理ユニット
+	//ボスユニット
+	Boss,      //ボス
+	Max
+};
+//状態
+enum class Status {
+	Normal,     //通常
+	SelfRepair, //自己修復中
+	Stop,       //機能停止
+	Charging,   //充電中
+	Repairing,  //修理中
+};
 
 ///━━━━━━━━━━
 /// ユニット管理クラス
@@ -27,7 +69,7 @@ public:
 	);
 	//ユニット削除
 	void RemoveUnit(Unit* unit);
-	//ユニット取得
+	//全ユニット取得
 	const std::vector<Unit*>& GetUnits()const
 	{
 		return m_units;
@@ -42,8 +84,16 @@ public:
 		const Vector3& pos,
 		float range
 	);
+	/// <summary>
+	/// ユニット性能取得
+	/// </summary>
+	const UnitParam& GetParam(
+		Type type
+	)const;
 private:
 	//ユニット一覧
 	std::vector<Unit*>m_units;
+	//種別パラメーター
+	UnitParam m_unitParam[(int)Type::Max];
 };
 

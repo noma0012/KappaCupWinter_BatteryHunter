@@ -1,30 +1,11 @@
 #pragma once
 #include "Weapon.h"
+#include "UnitManager.h"
 
 using namespace std;
 
 class Player;
 class UI;
-class UnitManager;
-
-enum class Type { //種類
-	//通常ユニット
-	Basic,     //基本ユニット
-	Charger,   //充電ユニット
-	//特殊ユニット
-	Repair,    //修理ユニット
-	//ボスユニット
-	Boss,      //ボス
-	Max
-};
-//状態
-enum class Status { 
-	Normal,     //通常
-	SelfRepair, //自己修復中
-	Stop,       //機能停止
-	Charging,   //充電中
-	Repairing   //修理中
-};
 
 class Unit : public IGameObject
 {

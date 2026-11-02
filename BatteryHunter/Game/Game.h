@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Level3DRender/LevelRender.h"
-#include "Unit.h"
+#include "UnitManager.h"
+
 using namespace std;
 
 class Player;
