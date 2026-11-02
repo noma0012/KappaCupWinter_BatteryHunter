@@ -13,6 +13,12 @@ BatteryItem::BatteryItem()
 	modelRender.Init("Assets/modelData/Battery/normal_battery.tkm");
 	//コアバッテリー読み込み
 	//modelRender.Init("Assets/modelData/Battery/core_battery.tkm");
+	//電動ドリル読み込み
+	//modelRender.Init("Assets/modelData/Battery/repair_tool_drill.tkm");
+	//スパナ読み込み
+	//modelRender.Init("Assets/modelData/Battery/repair_tool_spanner.tkm");
+	//セル5(青)・セル4(緑)・セル3(黄)・セル2(橙)・セル1(赤)・セル0(灰)読み込み
+	//modelRender.Init("Assets/modelData/Battery/charge_pack_5.tkm");
 
 	player = FindGO<Player>("player");
 	ui = FindGO<UI>("ui");
