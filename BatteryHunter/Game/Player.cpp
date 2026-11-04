@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Player.h"
 #include "BulletManager.h"
+#include "UI.h"
 
 Player::Player()
 {
@@ -27,6 +28,7 @@ Player::Player()
 	m_isEscape = false;
 	m_isDead = false;
 
+	ui = FindGO<UI>("ui");
 }
 
 Player::~Player()
@@ -37,6 +39,8 @@ Player::~Player()
 //更新処理。
 void Player::Update()
 {
+	if (ui == nullptr) { ui = FindGO<UI>("ui"); }
+
 	Move();               //移動処理
 	Rotation();           //回転処理
 	ManageState();	      //ステート管理
@@ -139,7 +143,6 @@ void Player::ManageState()
 	{
 		//ステートを1(ジャンプ中)にする。
 		playerState = 1;
-		//ここでManageStateの処理を終わらせる。
 		return;
 	}
 
@@ -196,7 +199,16 @@ bool Player::IsBatteryEmpty()const
 //ダメージ
 void Player::Damage(int value) 
 {
+	//バッテリ消費
 	ConsumeBattery(value);
+	//UIが無い
+	if (ui == nullptr) { return; };
+	//ダメージポップ位置
+	Vector3 popupPos = position;
+	//頭上
+	popupPos.y += 120.0f;
+	//ダメージポップ生成
+	ui->CreateDamagePopup(value, popupPos);
 }
 //コアバッテリー取得
 void Player::GetCoreBattery() 

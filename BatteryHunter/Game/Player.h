@@ -1,4 +1,5 @@
 #pragma once
+class UI;
 
 //プレイヤークラス。
 class Player : public IGameObject
@@ -104,4 +105,6 @@ private:
 	float m_shotInterval = 0.15f;
 	//発射タイマー
 	float m_shotTimer = 0.0f;
+
+	UI* ui = nullptr;
 };

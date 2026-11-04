@@ -25,12 +25,18 @@ private:
 	void Render(RenderContext& rc); //描画処理
 	void Direction();               //方向処理
 	void Move();                    //移動処理
-	void PushUnit();  //ユニット押し出し処理
-	void PushPlayer();//プレイヤー押し出し処理
-	void SelfRepair();//自己修復
+	void PushUnit();      //ユニット押し出し処理
+	void PushPlayer();    //プレイヤー押し出し処理
+	void SelfRepair();    //自己修復
+	void Patrol();        //巡回
+	void Chase();         //プレイヤー追跡
+	void Escape();        //発電機へ避難
+	void MoveDirection(const Vector3& dir); //移動共通処理
+	void Attack();        //攻撃処理
 	//Vector3
 	Vector3 position;      //位置(ユニット)
 	Vector3 direction;     //方向(Vector3)
+	Vector3 patrolTarget;  //巡回地点
 	//float
 	float moveSpeed;            //移動速度
 	float distance;             //方向(float)
@@ -40,7 +46,7 @@ private:
 	ModelRender modelRender;    //ユニット
 	ModelRender StopModel;      //機能停止ユニット
 	Quaternion rotation;        //ユニット回転
-	PhysicsStaticObject physicsStaticObject;
+	//PhysicsStaticObject physicsStaticObject;
 	CharacterController characterController;
 
 	Weapon weapon;
@@ -49,11 +55,13 @@ private:
 	float selfRepairTimer = 0.0f;//自己修復タイマー
 	float stopTimer = 0.0f;//機能停止タイマー
 	Status status = Status::Normal;//状態
-	
+	float patrolTimer = 0.0f;
+	float attackTimer = 0.0f;//攻撃間隔タイマー
 
 	Player* player = nullptr;
 	UI* ui;
 	Unit* target = nullptr;
 	UnitManager* unitManager = nullptr;
+	const UnitParam* param = nullptr;
 };
 

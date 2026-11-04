@@ -17,7 +17,7 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 	///━━━━━━━━━━━
 	switch (type)
 	{
-	//通常ユニット
+		//通常ユニット
 	case Type::Basic:
 		//基本ユニット読み込み
 		modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
@@ -26,12 +26,12 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 		//充電ユニット読み込み
 		modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
 		break;
-	//特殊ユニット
+		//特殊ユニット
 	case Type::Repair:
 		//修理ユニット読み込み
 		modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
 		break;
-	//ボスユニット
+		//ボスユニット
 	case Type::Boss:
 		//ボスユニット読み込み
 		modelRender.Init("Assets/modelData/Unit/Unit_Enemy_Boss.tkm");
@@ -41,51 +41,62 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 	modelRender.SetPosition(position);//座標設定
 	modelRender.Update();             //更新処理
 	//当たり判定
-	physicsStaticObject.CreateFromModel(
-		modelRender.GetModel(),
-		modelRender.GetModel().GetWorldMatrix()
-	);
+	//physicsStaticObject.CreateFromModel(
+	//	modelRender.GetModel(),
+	//	modelRender.GetModel().GetWorldMatrix()
+	//);
 
 	player = FindGO<Player>("player");
 	ui = FindGO<UI>("ui");
 	unitManager = FindGO<UnitManager>("unitManager");
+	//性能取得
+	if (unitManager)
+	{
+		param = &unitManager->GetParam(type);
+
+		hp = param->hp;
+		battery = param->battery;
+	}
 }
-Unit::Unit() 
+Unit::Unit()
 {
 
 }
-Unit::~Unit() 
+Unit::~Unit()
 {
 
 }
 //更新処理
 void Unit::Update() {
-	//Plaeyr取得
+	//再取得
 	if (player == nullptr) { player = FindGO<Player>("player"); }
-	//UI取得
-	if (ui == nullptr){ ui = FindGO<UI>("ui"); }
-	//UnitManager取得
+	if (ui == nullptr) { ui = FindGO<UI>("ui"); }
 	if (unitManager == nullptr) { unitManager = FindGO<UnitManager>("unitManager"); }
+	if (param == nullptr && unitManager != nullptr)
+	{
+		param = &unitManager->GetParam(type);
+	}
+
 	//重力
-	if (characterController.IsOnGround()) {
-		position.y = 0.0f;
-	}
-	else {
-		position.y -= 2.5f;
-	}
+	if (characterController.IsOnGround()) { position.y = 0.0f; }
+	else { position.y -= 2.5f; }
 
 	switch (status)
 	{
 	case Status::Normal:
-		//元に戻す
-		modelRender.SetScale(Vector3(1.0f, 1.0f, 1.0f));
 		Direction(); //方向処理
-		Move();      //移動処理
+		//攻撃範囲内の場合
+		if (distance <= param->attackRange)
+		{
+			Attack();//攻撃処理
+		}
+		else
+		{
+			Move();      //移動処理
+		}
+		
 		break;
 	case Status::SelfRepair:
-		//少し大きくする
-		modelRender.SetScale(Vector3(1.2f, 1.2f, 1.2f));
-		
 		SelfRepair();
 		break;
 	case Status::Stop:
@@ -132,7 +143,7 @@ void Unit::Update() {
 	{
 		battery = 0.0f;
 	}
-	
+
 	//バッテリー切れ
 	if (battery <= 0.0f)
 	{
@@ -147,11 +158,11 @@ void Unit::Update() {
 	StopModel.SetRotation(rotation);
 	StopModel.SetPosition(position);
 	//当たり判定の追従
-	physicsStaticObject.Release();
-	physicsStaticObject.CreateFromModel(
-		modelRender.GetModel(),
-		modelRender.GetModel().GetWorldMatrix()
-	);
+	//physicsStaticObject.Release();
+	//physicsStaticObject.CreateFromModel(
+	//	modelRender.GetModel(),
+	//	modelRender.GetModel().GetWorldMatrix()
+	//);
 	//モデル更新
 	modelRender.Update();
 	StopModel.Update();
@@ -166,22 +177,47 @@ void Unit::Direction() {
 	direction.Normalize();
 
 	//方向変更
-	rotation.SetRotationYFromDirectionXZ(direction);
+	//rotation.SetRotationYFromDirectionXZ(direction);
 }
 //移動処理
 void Unit::Move() {
 
-	//目標へ向かう
-	//ここの>を<に変えて数字の部分を
-	//索敵範囲のやつに変えたら出来る
-	if (distance >50.0f) {
-		position += direction * 4.0f;
+	if (param == nullptr) { return; }
+	switch (type)
+	{
+	case Type::Basic:
+		if (distance <= param->searchRange)
+		{
+			Chase();
+		}
+		else
+		{
+			Patrol();
+		}
+		break;
+	case Type::Charger:
+		if (battery <= 20.0f)
+		{
+			Escape();
+		}
+		else
+		{
+			Patrol();
+		}
+		break;
+	case Type::Repair:
+		Patrol();
+		break;
+	case Type::Boss:
+		break;
+	case Type::Max:
+		break;
+	default:
+		break;
 	}
-	//移動(電力消費)
-	battery -= 0.4f * g_gameTime->GetFrameDeltaTime();
 }
 //ユニット押し出し処理
-void Unit::PushUnit() 
+void Unit::PushUnit()
 {
 	//ユニット管理クラスが存在しない場合
 	if (unitManager == nullptr) { return; }
@@ -189,7 +225,7 @@ void Unit::PushUnit()
 	//近くのユニットのみ取得( 例：検索範囲 = 200.0f )
 	auto nearUnits = unitManager->GetNearUnits(position, 200.0f);
 	//近距離ユニットのみ処理
-	for (auto other : nearUnits) 
+	for (auto other : nearUnits)
 	{
 		//自分自身は除外
 		if (other == this) { continue; }
@@ -296,6 +332,86 @@ void Unit::SelfRepair()
 		status = Status::Normal;
 	}
 }
+//移動共通処理
+void Unit::MoveDirection(const Vector3& dir)
+{
+	//停止
+	if (dir.LengthSq() <= 0.0001f) { return; }
+	//移動
+	position += dir * param->moveSpeed;
+	//向き変更
+	rotation.SetRotationYFromDirectionXZ(dir);
+	//電力消費
+	battery -= param->moveBatteryCost * g_gameTime->GetFrameDeltaTime();
+}
+//プレイヤー追跡
+void Unit::Chase()
+{
+	//攻撃範囲
+	if (distance <= param->attackRange)
+	{
+		return;
+	}
+	//プレイヤーへ向く
+	rotation.SetRotationYFromDirectionXZ(direction);
+
+	MoveDirection(direction);
+}
+//発電機へ退避
+void Unit::Escape()
+{
+	Vector3 generatorPos = { 0.0f,0.0f,0.0f };
+	Vector3 dir = generatorPos - position;
+	if (dir.LengthSq() <= 0.0001f) { return; }
+	dir.Normalize();
+	MoveDirection(dir);
+}
+//巡回
+void Unit::Patrol()
+{
+	//タイマー加算
+	patrolTimer += g_gameTime->GetFrameDeltaTime();
+	//巡回地点未設定または到着した場合
+	Vector3 dir = patrolTarget - position;
+	if (patrolTimer >= 5.0f|| dir.LengthSq() <= 100.0f)
+	{
+		//タイマーリセット
+		patrolTimer = 0.0f;
+		//新しい巡回地点を決定
+		patrolTarget.x = position.x + (rand() % 400 - 200);
+
+		patrolTarget.y = 0.0f;
+
+		patrolTarget.z = position.z + (rand() % 400 - 200);
+
+		//方向再計算
+		dir = patrolTarget - position;
+	}
+	//移動方向
+	if (dir.LengthSq() <= 0.0001f) { return; }
+	dir.Normalize();
+	//共通移動処理
+	MoveDirection(dir);
+}
+//攻撃処理
+void Unit::Attack()
+{
+	//プレイヤーが存在しない
+	if (player == nullptr) { return; }
+	//プレイヤーへ向く
+	rotation.SetRotationYFromDirectionXZ(direction);
+	//攻撃タイマー加算
+	attackTimer += g_gameTime->GetFrameDeltaTime();
+	//攻撃間隔チェック
+	if (attackTimer < param->attackInterval) { return; }
+	//タイマーリセット
+	attackTimer = 0.0f;
+	//プレイヤーへダメージ
+	player->Damage( param->attackPower );
+	//攻撃時バッテリー消費
+	battery -= param->attackBatteryCost;
+
+}
 //描画処理
 void Unit::Render(RenderContext& rc)
 {
@@ -303,7 +419,7 @@ void Unit::Render(RenderContext& rc)
 	{
 		StopModel.Draw(rc);//機能停止ユニット
 	}
-	else 
+	else
 	{
 		modelRender.Draw(rc); //ユニット
 	}
