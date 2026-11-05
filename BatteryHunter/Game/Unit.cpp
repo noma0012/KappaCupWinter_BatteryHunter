@@ -24,13 +24,16 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 		//素手読み込み
 		gearModel.Init("Assets/modelData/Unit/Fist.tkm");
 		subGearModel.Init("Assets/modelData/Unit/Fist.tkm");
+		//機能停止時の素手読み込み
+		stopGearModel.Init("Assets/modelData/Unit/Stop_Fist.tkm");
+		stopSubGearModel.Init("Assets/modelData/Unit/Stop_Fist.tkm");
 		hasGear = true;
 		hasSubGear = true;
 		break;
 	case Type::Charger:
 		//充電ユニット読み込み
 		modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
-		//充電バックパック
+		//充電バックパック(0～5)
 		batteryPack[0].Init("Assets/modelData/Battery/charge_pack_0.tkm");
 		batteryPack[1].Init("Assets/modelData/Battery/charge_pack_1.tkm");
 		batteryPack[2].Init("Assets/modelData/Battery/charge_pack_2.tkm");
@@ -176,16 +179,15 @@ void Unit::Update() {
 	//機能停止モデル
 	StopModel.SetRotation(rotation);
 	StopModel.SetPosition(position);
-	////装備
-	//gearModel.SetRotation(rotation);
-	//gearModel.SetPosition(position);
-	//subGearModel.SetRotation(rotation);
-	//subGearModel.SetPosition(position);
 	//モデル更新
 	modelRender.Update();
-	StopModel.Update();
 	gearModel.Update();
 	subGearModel.Update();
+
+	StopModel.Update();
+	stopGearModel.Update();
+	stopSubGearModel.Update();
+
 }
 //方向処理
 void Unit::Direction() {
@@ -203,6 +205,7 @@ void Unit::Direction() {
 void Unit::Move() {
 
 	if (param == nullptr) { return; }
+
 	switch (type)
 	{
 	case Type::Basic:
@@ -227,12 +230,6 @@ void Unit::Move() {
 		break;
 	case Type::Repair:
 		Patrol();
-		break;
-	case Type::Boss:
-		break;
-	case Type::Max:
-		break;
-	default:
 		break;
 	}
 }
@@ -445,15 +442,29 @@ void Unit::UpdateGear()
 		Vector3 rightHand = { 40.0f,20.0f,30.0f };
 		rotation.Apply(rightHand);
 		rightPos += rightHand;
-		gearModel.SetPosition(rightPos);
-		gearModel.SetRotation(rotation);
+
 		//左拳
 		Vector3 leftPos = position;
 		Vector3 leftHand = { -40.0f,20.0f,30.0f };
 		rotation.Apply(leftHand);
 		leftPos += leftHand;
-		subGearModel.SetPosition(leftPos);
-		subGearModel.SetRotation(rotation);
+
+		if (status != Status::Stop)
+		{
+			//通常時の素手
+			gearModel.SetPosition(rightPos);
+			gearModel.SetRotation(rotation);
+			subGearModel.SetPosition(leftPos);
+			subGearModel.SetRotation(rotation);
+		}
+		else
+		{
+			//機能停止時の素手
+			stopGearModel.SetPosition(rightPos);
+			stopGearModel.SetRotation(rotation);
+			stopSubGearModel.SetPosition(leftPos);
+			stopSubGearModel.SetRotation(rotation);
+		}
 	}
 	break;
 	case Type::Charger:
@@ -505,7 +516,7 @@ void Unit::UpdateBatteryPack()
 	else if (battery >= 60.0f) { level = 4; }
 	else if (battery >= 40.0f) { level = 3; }
 	else if (battery >= 20.0f) { level = 2; }
-	else if (battery >= 0.0f)  { level = 1; }
+	else if (battery >   0.0f) { level = 1; }
 	else                       { level = 0; }
 	//変更なし
 	if (batteryLevel == level) { return; }
@@ -515,11 +526,16 @@ void Unit::UpdateBatteryPack()
 void Unit::Render(RenderContext& rc)
 {
 	if (status == Status::Stop){ StopModel.  Draw(rc); } //機能停止ユニット
+	else                       { modelRender.Draw(rc); } //ユニット
+	//充電ユニットのみ
+	if (type == Type::Charger) { batteryPack[batteryLevel].Draw(rc); }
 	else
-	{ 
-		modelRender.Draw(rc);  //ユニット
-		if (type == Type::Charger) {
-			batteryPack[batteryLevel].Draw(rc);
+	{
+		if (type == Type::Basic&&status==Status::Stop)
+		{
+			//機能停止時の装備
+			stopGearModel.Draw(rc);
+			stopSubGearModel.Draw(rc);
 		}
 		else
 		{

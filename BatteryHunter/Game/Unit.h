@@ -51,6 +51,10 @@ private:
 	ModelRender gearModel;      //メイン装備
 	ModelRender subGearModel;   //サブ装備(修理ユニット用)
 	ModelRender batteryPack[6]; //バックパック(充電ユニット用)
+
+	ModelRender stopGearModel;    //機能停止時メイン装備(基本ユニット用)
+	ModelRender stopSubGearModel; //機能停止時サブ装備(基本ユニット用)
+
 	Quaternion rotation;        //ユニット回転
 	CharacterController characterController;
 
