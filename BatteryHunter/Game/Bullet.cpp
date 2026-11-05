@@ -23,7 +23,7 @@ void Bullet::Fire(
 {
 	m_position = pos;        //初期座標
 	//発射方向
-	m_direction = dir;       
+	m_direction = dir;
 	m_direction.Normalize();
 	m_bulletType = type;     //弾種類
 	m_speed = 1500.0f;       //移動速度
@@ -48,7 +48,6 @@ void Bullet::Update()
 	//寿命切れ
 	if (m_lifeTime <= 0.0f)
 	{
-		m_modelRender.RemoveFromRaytracingWorld();
 		m_isActive = false;
 		return;
 	}
@@ -66,7 +65,6 @@ void Bullet::Update()
 			if (diff.LengthSq() < limit * limit)
 			{
 				unit->TakeDamage(10);
-				m_modelRender.RemoveFromRaytracingWorld();
 				m_isActive = false;
 				return;
 			}

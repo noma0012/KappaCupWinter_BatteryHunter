@@ -288,10 +288,6 @@ namespace nsK2Engine {
 		void SetRaytracingWorld(bool flag) {
 			m_isRaytracingWorld = flag;
 		}
-		/// <summary>
-		/// レイトレーシングワールドから削除
-		/// </summary>
-		void RemoveFromRaytracingWorld();
 	private:
 		/// <summary>
 		/// スケルトンの初期化。
@@ -452,7 +448,7 @@ namespace nsK2Engine {
 		int							m_numInstance = 0;					// インスタンスの数。
 		int							m_maxInstance = 1;					// 最大インスタンス数。
 		bool						m_isEnableInstancingDraw = false;	// インスタンシング描画が有効？
-		bool						m_isRaytracingWorld = true;			//レイトレワールドに登録する？
+		bool						m_isRaytracingWorld = false;		//レイトレワールドに登録する？
 		std::unique_ptr<Matrix[]>	m_worldMatrixArray;					// ワールド行列の配列。
 		StructuredBuffer			m_worldMatrixArraySB;				// ワールド行列の配列のストラクチャードバッファ。
 		std::vector< GemometryData > m_geometryDatas;					// ジオメトリ情報。

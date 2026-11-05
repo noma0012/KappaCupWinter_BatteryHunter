@@ -35,6 +35,7 @@ private:
 	void MoveDirection( const Vector3& dir ); //移動共通処理
 	void Attack();        //攻撃処理
 	void UpdateGear();    //装備位置更新
+	void UpdateBatteryPack(); //バックパック更新処理
 	//Vector3
 	Vector3 position;      //位置(ユニット)
 	Vector3 direction;     //方向(Vector3)
@@ -49,11 +50,12 @@ private:
 	ModelRender StopModel;      //機能停止ユニット
 	ModelRender gearModel;      //メイン装備
 	ModelRender subGearModel;   //サブ装備(修理ユニット用)
+	ModelRender batteryPack[6]; //バックパック(充電ユニット用)
 	Quaternion rotation;        //ユニット回転
 	CharacterController characterController;
 
-
 	int hp = 100;
+	int batteryLevel = 5;//現在表示レベル
 	float battery = 100.0f;//バッテリー残量
 	float selfRepairTimer = 0.0f;//自己修復タイマー
 	float stopTimer = 0.0f;//機能停止タイマー

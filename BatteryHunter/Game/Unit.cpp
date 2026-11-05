@@ -31,7 +31,12 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 		//充電ユニット読み込み
 		modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
 		//充電バックパック
-		gearModel.Init("Assets/modelData/Battery/charge_pack_5.tkm");
+		batteryPack[0].Init("Assets/modelData/Battery/charge_pack_0.tkm");
+		batteryPack[1].Init("Assets/modelData/Battery/charge_pack_1.tkm");
+		batteryPack[2].Init("Assets/modelData/Battery/charge_pack_2.tkm");
+		batteryPack[3].Init("Assets/modelData/Battery/charge_pack_3.tkm");
+		batteryPack[4].Init("Assets/modelData/Battery/charge_pack_4.tkm");
+		batteryPack[5].Init("Assets/modelData/Battery/charge_pack_5.tkm");
 		hasGear = true;
 		break;
 		//特殊ユニット
@@ -87,6 +92,8 @@ void Unit::Update() {
 	//重力
 	if (characterController.IsOnGround()) { position.y = 0.0f; }
 	else { position.y -= 2.5f; }
+
+	UpdateBatteryPack(); //バックパック更新処理
 
 	switch (status)
 	{
@@ -456,8 +463,12 @@ void Unit::UpdateGear()
 		Vector3 back = { 0.0f,0.0f,-0.4f };
 		rotation.Apply(back);
 		gearPos += back;
-		gearModel.SetPosition(gearPos);
-		gearModel.SetRotation(rotation);
+		for (int i = 0; i < 6; i++)
+		{
+			batteryPack[i].SetPosition(gearPos);
+			batteryPack[i].SetRotation(rotation);
+			batteryPack[i].Update();
+		}
 	}
 	break;
 	case Type::Repair:
@@ -482,6 +493,24 @@ void Unit::UpdateGear()
 		break;
 	}
 }
+//バックパック更新処理
+void Unit::UpdateBatteryPack()
+{
+	//充電ユニット以外の場合
+	if (type != Type::Charger) { return; }
+	int level = 0;
+
+	//残量判定
+	     if (battery >= 80.0f) { level = 5; }
+	else if (battery >= 60.0f) { level = 4; }
+	else if (battery >= 40.0f) { level = 3; }
+	else if (battery >= 20.0f) { level = 2; }
+	else if (battery >= 0.0f)  { level = 1; }
+	else                       { level = 0; }
+	//変更なし
+	if (batteryLevel == level) { return; }
+	batteryLevel = level;
+}
 //描画処理
 void Unit::Render(RenderContext& rc)
 {
@@ -489,7 +518,13 @@ void Unit::Render(RenderContext& rc)
 	else
 	{ 
 		modelRender.Draw(rc);  //ユニット
-		if (hasGear)   { gearModel.   Draw(rc); } //装備
-		if (hasSubGear){ subGearModel.Draw(rc); } //サブ装備
+		if (type == Type::Charger) {
+			batteryPack[batteryLevel].Draw(rc);
+		}
+		else
+		{
+			if (hasGear) { gearModel.Draw(rc); } //装備
+			if (hasSubGear) { subGearModel.Draw(rc); } //サブ装備
+		}
 	}
 }

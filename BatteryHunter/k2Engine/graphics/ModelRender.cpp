@@ -25,19 +25,6 @@ namespace nsK2Engine {
 			}
 		}
 	}
-	/// <summary>
-	/// レイトレーシングワールドから削除
-	/// </summary>
-	void ModelRender::RemoveFromRaytracingWorld()
-	{
-		if (m_addRaytracingWorldModel)
-		{
-			g_renderingEngine->RemoveModelFromRaytracingWorld(
-				*m_addRaytracingWorldModel
-			);
-			m_addRaytracingWorldModel = nullptr;
-		}
-	}
 	void ModelRender::OnRecievedEventFromRenderingEngine(RenderingEngine::EnEvent enEvent)
 	{
 		if (enEvent == RenderingEngine::enEventReInitIBLTexture
