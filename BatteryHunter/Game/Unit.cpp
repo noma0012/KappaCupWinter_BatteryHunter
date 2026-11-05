@@ -21,15 +21,27 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 	case Type::Basic:
 		//基本ユニット読み込み
 		modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
+		//素手読み込み
+		gearModel.Init("Assets/modelData/Unit/Fist.tkm");
+		hasGear = true;
 		break;
 	case Type::Charger:
 		//充電ユニット読み込み
 		modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
+		//充電バックパック
+		gearModel.Init("Assets/modelData/Battery/charge_pack_5.tkm");
+		hasGear = true;
 		break;
 		//特殊ユニット
 	case Type::Repair:
 		//修理ユニット読み込み
 		modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
+		//電動ドリル
+		gearModel.Init("Assets/modelData/Battery/repair_tool_drill.tkm");
+		//スパナ
+		subGearModel.Init("Assets/modelData/Battery/repair_tool_spanner.tkm");
+		hasGear = true;
+		hasSubGear = true;
 		break;
 		//ボスユニット
 	case Type::Boss:
@@ -40,11 +52,6 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 	StopModel.Init("Assets/modelData/Unit/Unit_Enemy_Stop.tkm");
 	modelRender.SetPosition(position);//座標設定
 	modelRender.Update();             //更新処理
-	//当たり判定
-	//physicsStaticObject.CreateFromModel(
-	//	modelRender.GetModel(),
-	//	modelRender.GetModel().GetWorldMatrix()
-	//);
 
 	player = FindGO<Player>("player");
 	ui = FindGO<UI>("ui");
@@ -72,10 +79,7 @@ void Unit::Update() {
 	if (player == nullptr) { player = FindGO<Player>("player"); }
 	if (ui == nullptr) { ui = FindGO<UI>("ui"); }
 	if (unitManager == nullptr) { unitManager = FindGO<UnitManager>("unitManager"); }
-	if (param == nullptr && unitManager != nullptr)
-	{
-		param = &unitManager->GetParam(type);
-	}
+	if (param == nullptr && unitManager != nullptr){ param = &unitManager->GetParam(type); }
 
 	//重力
 	if (characterController.IsOnGround()) { position.y = 0.0f; }
@@ -84,6 +88,7 @@ void Unit::Update() {
 	switch (status)
 	{
 	case Status::Normal:
+		//通常
 		Direction(); //方向処理
 		//攻撃範囲内の場合
 		if (distance <= param->attackRange)
@@ -92,11 +97,12 @@ void Unit::Update() {
 		}
 		else
 		{
-			Move();      //移動処理
+			Move(); //移動処理
 		}
 		
 		break;
 	case Status::SelfRepair:
+		//自己修復
 		SelfRepair();
 		break;
 	case Status::Stop:
@@ -121,8 +127,10 @@ void Unit::Update() {
 
 		break;
 	case Status::Charging:
+		//充電中
 		break;
 	case Status::Repairing:
+		//修理中
 		break;
 	default:
 		break;
@@ -157,15 +165,16 @@ void Unit::Update() {
 	//機能停止モデル
 	StopModel.SetRotation(rotation);
 	StopModel.SetPosition(position);
-	//当たり判定の追従
-	//physicsStaticObject.Release();
-	//physicsStaticObject.CreateFromModel(
-	//	modelRender.GetModel(),
-	//	modelRender.GetModel().GetWorldMatrix()
-	//);
+	//装備
+	gearModel.SetRotation(rotation);
+	gearModel.SetPosition(position);
+	subGearModel.SetRotation(rotation);
+	subGearModel.SetPosition(position);
 	//モデル更新
 	modelRender.Update();
 	StopModel.Update();
+	gearModel.Update();
+	subGearModel.Update();
 }
 //方向処理
 void Unit::Direction() {
@@ -415,12 +424,11 @@ void Unit::Attack()
 //描画処理
 void Unit::Render(RenderContext& rc)
 {
-	if (status == Status::Stop)
-	{
-		StopModel.Draw(rc);//機能停止ユニット
-	}
+	if (status == Status::Stop){ StopModel.  Draw(rc); } //機能停止ユニット
 	else
-	{
-		modelRender.Draw(rc); //ユニット
+	{ 
+		modelRender.Draw(rc);  //ユニット
+		if (hasGear)   { gearModel.   Draw(rc); } //装備
+		if (hasSubGear){ subGearModel.Draw(rc); } //サブ装備
 	}
 }

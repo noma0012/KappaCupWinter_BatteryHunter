@@ -10,7 +10,8 @@ class UI;
 class Unit : public IGameObject
 {
 public:
-	Type type;//種類
+	Type type;     //種類
+	Weapon weapon;
 
 	Unit();
 	~Unit();
@@ -31,7 +32,7 @@ private:
 	void Patrol();        //巡回
 	void Chase();         //プレイヤー追跡
 	void Escape();        //発電機へ避難
-	void MoveDirection(const Vector3& dir); //移動共通処理
+	void MoveDirection( const Vector3& dir ); //移動共通処理
 	void Attack();        //攻撃処理
 	//Vector3
 	Vector3 position;      //位置(ユニット)
@@ -45,11 +46,12 @@ private:
 	//その他
 	ModelRender modelRender;    //ユニット
 	ModelRender StopModel;      //機能停止ユニット
+	ModelRender gearModel;      //メイン装備
+	ModelRender subGearModel;   //サブ装備(修理ユニット用)
 	Quaternion rotation;        //ユニット回転
-	//PhysicsStaticObject physicsStaticObject;
 	CharacterController characterController;
 
-	Weapon weapon;
+
 	int hp = 100;
 	float battery = 100.0f;//バッテリー残量
 	float selfRepairTimer = 0.0f;//自己修復タイマー
@@ -57,6 +59,10 @@ private:
 	Status status = Status::Normal;//状態
 	float patrolTimer = 0.0f;
 	float attackTimer = 0.0f;//攻撃間隔タイマー
+
+	//装備の有無(false なし true あり)
+	bool hasGear = false;
+	bool hasSubGear = false;
 
 	Player* player = nullptr;
 	UI* ui;
