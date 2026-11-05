@@ -23,7 +23,9 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 		modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
 		//素手読み込み
 		gearModel.Init("Assets/modelData/Unit/Fist.tkm");
+		subGearModel.Init("Assets/modelData/Unit/Fist.tkm");
 		hasGear = true;
+		hasSubGear = true;
 		break;
 	case Type::Charger:
 		//充電ユニット読み込み
@@ -76,11 +78,12 @@ Unit::~Unit()
 //更新処理
 void Unit::Update() {
 	//再取得
-	if (player == nullptr) { player = FindGO<Player>("player"); }
-	if (ui == nullptr) { ui = FindGO<UI>("ui"); }
-	if (unitManager == nullptr) { unitManager = FindGO<UnitManager>("unitManager"); }
-	if (param == nullptr && unitManager != nullptr){ param = &unitManager->GetParam(type); }
-
+	{
+		if (player == nullptr) { player = FindGO<Player>("player"); }
+		if (ui == nullptr) { ui = FindGO<UI>("ui"); }
+		if (unitManager == nullptr) { unitManager = FindGO<UnitManager>("unitManager"); }
+		if (param == nullptr && unitManager != nullptr) { param = &unitManager->GetParam(type); }
+	}
 	//重力
 	if (characterController.IsOnGround()) { position.y = 0.0f; }
 	else { position.y -= 2.5f; }
@@ -135,9 +138,10 @@ void Unit::Update() {
 	default:
 		break;
 	}
+	
 	PushUnit();  //ユニット押し出し処理
 	PushPlayer();//プレイヤー押し出し処理
-
+	UpdateGear();//装備位置更新処理
 	//仮(不必要・テスト)
 	if (GetAsyncKeyState('1') & 0x0001)
 	{
@@ -165,11 +169,11 @@ void Unit::Update() {
 	//機能停止モデル
 	StopModel.SetRotation(rotation);
 	StopModel.SetPosition(position);
-	//装備
-	gearModel.SetRotation(rotation);
-	gearModel.SetPosition(position);
-	subGearModel.SetRotation(rotation);
-	subGearModel.SetPosition(position);
+	////装備
+	//gearModel.SetRotation(rotation);
+	//gearModel.SetPosition(position);
+	//subGearModel.SetRotation(rotation);
+	//subGearModel.SetPosition(position);
 	//モデル更新
 	modelRender.Update();
 	StopModel.Update();
@@ -420,6 +424,63 @@ void Unit::Attack()
 	//攻撃時バッテリー消費
 	battery -= param->attackBatteryCost;
 
+}
+//装備位置更新処理
+void Unit::UpdateGear()
+{
+	//装備位置設定
+	switch (type)
+	{
+	case Type::Basic:
+	{
+		//右拳
+		Vector3 rightPos = position;
+		Vector3 rightHand = { 40.0f,20.0f,30.0f };
+		rotation.Apply(rightHand);
+		rightPos += rightHand;
+		gearModel.SetPosition(rightPos);
+		gearModel.SetRotation(rotation);
+		//左拳
+		Vector3 leftPos = position;
+		Vector3 leftHand = { -40.0f,20.0f,30.0f };
+		rotation.Apply(leftHand);
+		leftPos += leftHand;
+		subGearModel.SetPosition(leftPos);
+		subGearModel.SetRotation(rotation);
+	}
+	break;
+	case Type::Charger:
+	{
+		//バックパック
+		Vector3 gearPos = position;
+		Vector3 back = { 0.0f,0.0f,-0.4f };
+		rotation.Apply(back);
+		gearPos += back;
+		gearModel.SetPosition(gearPos);
+		gearModel.SetRotation(rotation);
+	}
+	break;
+	case Type::Repair:
+	{
+		//ドリル(右手)
+		Vector3 drillPos = position;
+		Vector3 right = { 40.0f,20.0f,30.0f };
+		rotation.Apply(right);
+		drillPos += right;
+		gearModel.SetPosition(drillPos);
+		gearModel.SetRotation(rotation);
+		//スパナ(左手)
+		Vector3 wrenchPos = position;
+		Vector3 left = { -40.0f,20.0f,30.0f };
+		rotation.Apply(left);
+		wrenchPos += left;
+		subGearModel.SetPosition(wrenchPos);
+		subGearModel.SetRotation(rotation);
+	}
+	break;
+	case Type::Boss:
+		break;
+	}
 }
 //描画処理
 void Unit::Render(RenderContext& rc)

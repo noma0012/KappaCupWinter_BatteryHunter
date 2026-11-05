@@ -39,9 +39,12 @@ bool Game::Start()
 	//ユニット管理クラス作成
 	unitManager_Ins = NewGO<UnitManager>(0, "unitManager");
 	//ユニット作成
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 2; i++) {
 		unitManager_Ins->SpawnUnit(Type::Basic, 1000.0f, 0.0f, 1000.0f);
+		unitManager_Ins->SpawnUnit(Type::Charger, 0.0f, 0.0f, 0.0f);
+		unitManager_Ins->SpawnUnit(Type::Repair, 0.0f, 0.0f, 0.0f);
 	}
+	
 
 
 	//弾管理オブジェクト作成

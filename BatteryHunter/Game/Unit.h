@@ -34,6 +34,7 @@ private:
 	void Escape();        //発電機へ避難
 	void MoveDirection( const Vector3& dir ); //移動共通処理
 	void Attack();        //攻撃処理
+	void UpdateGear();    //装備位置更新
 	//Vector3
 	Vector3 position;      //位置(ユニット)
 	Vector3 direction;     //方向(Vector3)
