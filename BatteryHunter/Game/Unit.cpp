@@ -219,13 +219,24 @@ void Unit::Move() {
 		}
 		break;
 	case Type::Charger:
+		//自身の電力残量不足
 		if (battery <= 20.0f)
 		{
 			Escape();
 		}
 		else
 		{
-			Patrol();
+			//対象検索
+			SearchChargeTarget();
+			//対象あり
+			if (target != nullptr)
+			{
+				Charge();
+			}
+			else
+			{
+				Patrol();
+			}
 		}
 		break;
 	case Type::Repair:
@@ -521,6 +532,78 @@ void Unit::UpdateBatteryPack()
 	//変更なし
 	if (batteryLevel == level) { return; }
 	batteryLevel = level;
+}
+//充電対象検索
+void Unit::SearchChargeTarget()
+{
+	//初期化
+	target = nullptr;
+	//管理クラスなし
+	if (unitManager == nullptr) { return; }
+	float nearestDistSq = FLT_MAX;
+	//全ユニット検索
+	for (auto unit : unitManager->GetUnits())
+	{
+		//自分自身の除外
+		if (unit == this) { continue; }
+		//停止ユニットまたは電力残量20%以下
+		if (unit->GetStatus() == Status::Stop||unit->GetBattery()<=20.0f)
+		{
+			Vector3 diff = unit->GetPosition() - position;
+			float distSq = diff.LengthSq();
+			if (distSq < nearestDistSq)
+			{
+				nearestDistSq = distSq;
+				target = unit;
+			}
+			continue;
+		}
+	}
+}
+//充電処理
+void Unit::Charge()
+{
+	//対象なし
+	if (target == nullptr) { return; }
+	//方向計算
+	Vector3 dir = target->GetPosition() - position;
+	float dist = dir.Length();
+	//充電範囲外
+	if (dist > 150.0f)
+	{
+		dir.Normalize();
+		MoveDirection(dir);
+
+		return;
+	}
+	//充電量
+	float chargeAmount= 10.0f * g_gameTime->GetFrameDeltaTime();
+	//対象へ充電
+	target->battery += chargeAmount;
+	//自身の電力消費
+	battery -= chargeAmount;
+	//対象バッテリー上限
+	if (target->battery > 100.0f)
+	{
+		target->battery = 100.0f;
+	}
+	//自身の下限
+	if (battery < 0.0f)
+	{
+		battery = 0.0f;
+	}
+	//機能停止ユニットの再起動
+	if (target->GetStatus() == Status::Stop && target->battery >= 20.0f)
+	{
+		target->status = Status::Normal;
+		target->stopTimer = 0.0f;
+	}
+	//充電完了
+	if (target->GetBattery() >= 100.0f)
+	{
+		target = nullptr;
+	}
+
 }
 //描画処理
 void Unit::Render(RenderContext& rc)

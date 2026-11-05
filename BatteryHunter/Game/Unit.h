@@ -21,6 +21,7 @@ public:
 	float GetRadius()const { return radius; }//方向取得
 	Vector3 GetPosition()const { return position; }//座標取得
 	Status GetStatus()const { return status; }//状態取得
+	float GetBattery()const { return battery; }//バッテリー取得
 private:
 	void Update();                  //更新処理
 	void Render(RenderContext& rc); //描画処理
@@ -36,6 +37,8 @@ private:
 	void Attack();        //攻撃処理
 	void UpdateGear();    //装備位置更新
 	void UpdateBatteryPack(); //バックパック更新処理
+	void SearchChargeTarget();//充電対象検索
+	void Charge();//充電処理
 	//Vector3
 	Vector3 position;      //位置(ユニット)
 	Vector3 direction;     //方向(Vector3)
