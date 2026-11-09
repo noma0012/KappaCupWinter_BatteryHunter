@@ -7,7 +7,7 @@ BackGround::BackGround()
 	//PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
 	
 	//ステージ(仮)を読み込む
-	modelRender.Init("Assets/modelData/ground.tkm");
+	modelRender.Init("Assets/modelData/stage/stage_8000.tkm");
 	modelRender.Update();
 	physicsStaticObject.CreateFromModel(modelRender.GetModel(), modelRender.GetModel().GetWorldMatrix());
 }

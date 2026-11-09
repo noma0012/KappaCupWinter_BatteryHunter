@@ -1,13 +1,15 @@
 #pragma once
 #include "Player.h"
 
+class UnitManager;
+
 class Bullet : public IGameObject
 {
 public:
 	Bullet();
 	~Bullet();
-	void Update();//更新処理
-	void Render(RenderContext& rc);//描画処理
+	void Update();                  //更新処理
+	void Render(RenderContext& rc); //描画処理
 	///━━━━━━━━━━━━━━
 	/// 発射
 	///
@@ -41,11 +43,12 @@ private:
 	ModelRender m_modelRender; //モデル
 	Vector3 m_position;        //座標
 	Vector3 m_direction;       //移動方向
-	float m_speed = 0.0f;      //移動速度
+	float m_speed = 0.0f;      //弾速
 	float m_lifeTime = 0.0f;   //生存時間(消えるまでの時間)
 	bool m_isActive = false;   //有効判定
 	float m_radius = 20.0f;    //当たり判定
 	//弾種類
 	Player::BulletType m_bulletType;
-};
 
+	UnitManager* m_unitManager = nullptr;
+};

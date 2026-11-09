@@ -148,8 +148,19 @@ void Unit::Update() {
 	default:
 		break;
 	}
+	//ユニット押し出し処理
+	{
+		float pushTimer = 0.0f;
+
+		pushTimer++;
+
+		if (pushTimer >= 0.1f)
+		{
+			PushUnit();
+			pushTimer = 0.0f;
+		}
+	}
 	
-	PushUnit();  //ユニット押し出し処理
 	PushPlayer();//プレイヤー押し出し処理
 	UpdateGear();//装備位置更新処理
 	//仮(不必要・テスト)
@@ -227,7 +238,19 @@ void Unit::Move() {
 		else
 		{
 			//対象検索
-			SearchChargeTarget();
+			{
+				float searchTimer = 0.0f;
+
+				searchTimer += g_gameTime->GetFrameDeltaTime();
+
+				if (searchTimer >= 0.5f)
+				{
+					
+					SearchChargeTarget();
+					searchTimer = 0.0f;
+				}
+			}
+
 			//対象あり
 			if (target != nullptr)
 			{
@@ -426,6 +449,8 @@ void Unit::Attack()
 {
 	//プレイヤーが存在しない
 	if (player == nullptr) { return; }
+	//基本ユニット以外の場合
+	if (type != Type::Basic) { return; }
 	//プレイヤーへ向く
 	rotation.SetRotationYFromDirectionXZ(direction);
 	//攻撃タイマー加算

@@ -9,6 +9,9 @@ Bullet::Bullet()
 {
 	//弾読み込み
 	m_modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
+
+	//UnitManager取得
+	m_unitManager = FindGO<UnitManager>("unitManager");
 }
 Bullet::~Bullet() 
 {
@@ -35,13 +38,11 @@ void Bullet::Fire(
 //更新管理
 void Bullet::Update() 
 {
+	//再取得
+	if (m_unitManager == nullptr) { m_unitManager = FindGO<UnitManager>("unitManager"); }
+
 	//無効の場合
 	if (!m_isActive) { return; }
-	//移動
-	m_position +=
-		m_direction *
-		m_speed *
-		g_gameTime->GetFrameDeltaTime();
 	//生存時間(寿命減少)
 	m_lifeTime -=
 		g_gameTime->GetFrameDeltaTime();
@@ -51,12 +52,17 @@ void Bullet::Update()
 		m_isActive = false;
 		return;
 	}
+	//移動量計算
+	m_position += m_direction * m_speed *
+		g_gameTime->GetFrameDeltaTime();
 
-	auto unitManager = FindGO<UnitManager>("unitManager");
-
-	if (unitManager)
+	//ユニット当たり判定
+	if (m_unitManager)
 	{
-		for (auto unit : unitManager->GetUnits())
+		//近くのユニットのみ取得
+		auto nearUnits = m_unitManager->GetNearUnits(m_position, 100.0f);
+
+		for (auto unit : nearUnits)
 		{
 			Vector3 diff =
 				unit->GetPosition() - m_position;
@@ -70,6 +76,7 @@ void Bullet::Update()
 			}
 		}
 	}
+	
 	//座標更新
 	m_modelRender.SetPosition(m_position);
 	//モデル更新
