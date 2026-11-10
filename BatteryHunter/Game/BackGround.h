@@ -10,4 +10,3 @@ public:
 	ModelRender modelRender;
 	PhysicsStaticObject physicsStaticObject;
 };
-

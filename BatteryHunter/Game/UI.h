@@ -22,6 +22,13 @@ public:
         B_Boss,
         B_Max
     };
+    //UI装飾
+    enum UIframe {
+        Time_frame,
+        Gauge_frame,
+        Background_frame,
+        Max_frame
+    };
     UI();
     ~UI();
     //更新管理
@@ -47,6 +54,8 @@ private:
     //フォント描画（既存のクラス）48px
     FontRender font[MaxUI];
     FontRender Line[3];
+    //画像描画
+    SpriteRender frame[Max_frame];
     //インスタンス
     Player* player;
     Game* game;

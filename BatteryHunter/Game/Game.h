@@ -11,6 +11,7 @@ class GameCamera;
 class GameClear;
 class UI;
 class UnitManager;
+class Generator;
 
 class Game : public IGameObject
 {
@@ -35,5 +36,6 @@ private:
 	UI*         ui_Ins;
 	GameClear* gameclear_Ins;
 	UnitManager* unitManager_Ins;
+	Generator* generator_Ins;
 };
 

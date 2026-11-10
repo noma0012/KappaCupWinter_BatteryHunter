@@ -35,6 +35,17 @@ UI::UI()
     Line[0].SetPosition({ -250.0f,470.0f,0.0f });
     Line[1].SetPosition({    0.0f,470.0f,0.0f });
     Line[2].SetPosition({  250.0f,470.0f,0.0f });
+    //時間装飾用
+    frame[Time_frame].Init("Assets/sprite/Time_frame.DDS",200.0f,70.0f);
+    frame[Time_frame].SetPosition({ 17.5f, 500.5f,0.0f });
+
+    //プレイヤー電力ゲージ装飾用
+    frame[Gauge_frame].Init("Assets/sprite/Gauge_frame.DDS", 340.0f, 200.0f);
+    frame[Gauge_frame].SetPosition({ -750.0f,-400.0f,0.0f });
+
+    //プレイヤー電力ゲージの背景装飾用
+    frame[Background_frame].Init("Assets/sprite/Time_frame.DDS", 320.0f, 50.0f);
+    frame[Background_frame].SetPosition({ -760.0f,-400.0f,0.0f });
 
     player = FindGO<Player>("player");
     game = FindGO<Game>("game");
@@ -59,6 +70,10 @@ void UI::Update()
         g_gameTime->GetFrameDeltaTime()
     );
 
+    for (int i = 0; i < Max_frame; i++)
+    {
+        frame[i].Update();
+    }
 }
 //時間管理
 void UI::SetTime()
@@ -120,9 +135,14 @@ void UI::CreateHealPopup(int Heal, const Vector3& pos)
 //描画管理
 void UI::Render(RenderContext& rc)
 {
+    frame[Time_frame].Draw(rc);
+    frame[Background_frame].Draw(rc);
+
     for (int i = 0; i < MaxUI; i++) { font[i].Draw(rc); }
     for (int i = 0; i < B_Max; i++) { Battery[i].Draw(rc); }
     for (int i = 0; i < 3; i++)     { Line[i].Draw(rc); }
+
+    frame[Gauge_frame].Draw(rc);
 
     // Popup描画
     m_textPopupManager.Draw(rc);

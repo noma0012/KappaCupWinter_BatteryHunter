@@ -9,6 +9,7 @@
 #include "BulletManager.h"
 #include "UnitManager.h"
 #include "BatteryManager.h"
+#include "Generator.h"
 
 //ゲームを管理するクラス
 bool Game::Start()
@@ -44,13 +45,13 @@ bool Game::Start()
 		unitManager_Ins->SpawnUnit(Type::Charger, 0.0f, 0.0f, 0.0f);
 		unitManager_Ins->SpawnUnit(Type::Repair, 0.0f, 0.0f, 0.0f);
 	}
-	
-
 
 	//弾管理オブジェクト作成
 	NewGO<BulletManager>(0, "bulletManager");
 	//バッテリー管理オブジェクト作成
 	NewGO<BatteryManager>(0, "batteryManager");
+	//発電機オブジェクト作成
+	generator_Ins = NewGO< Generator>(0, "generator");
 	//画面UI作成(一番下に配置)
 	ui_Ins = NewGO<UI>(0, "ui");
 	return true;
@@ -64,6 +65,7 @@ Game::~Game() {
 	DeleteGO(player_Ins);
 	DeleteGO(ui_Ins);
 	DeleteGO(unitManager_Ins);
+	DeleteGO(generator_Ins);
 	
 }
 void Game::Update()
