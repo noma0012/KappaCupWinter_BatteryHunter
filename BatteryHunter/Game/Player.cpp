@@ -17,6 +17,13 @@ Player::Player()
 	//ユニティちゃんのモデルを読み込む。
 	modelRender.Init("Assets/modelData/unityChan.tkm", animationClips, enAnimationClip_Num, enModelUpAxisY);
 
+	//初期地点設定
+	position = { 0.0f,0.0f,3800.0f };
+	modelRender.SetPosition(position);
+	//初期回転方向設定
+	rotation.SetRotationDegY(180.0f);
+	modelRender.SetRotation(rotation);
+
 	//キャラコンを初期化
 	characterController.Init(25.0f, 75.0f, position);
 
@@ -35,7 +42,6 @@ Player::~Player()
 {
 
 }
-
 //更新処理。
 void Player::Update()
 {

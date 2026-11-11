@@ -74,6 +74,9 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 		hp = param->hp;
 		battery = param->battery;
 	}
+
+	//キャラクターコントローラー初期化
+	characterController.Init(50.0f, 50.0f, position);
 }
 Unit::Unit()
 {
@@ -93,8 +96,14 @@ void Unit::Update() {
 		if (param == nullptr && unitManager != nullptr) { param = &unitManager->GetParam(type); }
 	}
 	//重力
-	if (characterController.IsOnGround()) { position.y = 0.0f; }
-	else { position.y -= 2.5f; }
+	if (characterController.IsOnGround())
+	{
+		move.y = 0.0f;
+	}
+	else
+	{
+		move.y -= 5.0f;
+	}
 
 	UpdateBatteryPack(); //バックパック更新処理
 
@@ -152,7 +161,7 @@ void Unit::Update() {
 	{
 		float pushTimer = 0.0f;
 
-		pushTimer++;
+		pushTimer+=g_gameTime->GetFrameDeltaTime();
 
 		if (pushTimer >= 0.1f)
 		{
@@ -389,7 +398,11 @@ void Unit::MoveDirection(const Vector3& dir)
 	//停止
 	if (dir.LengthSq() <= 0.0001f) { return; }
 	//移動
-	position += dir * param->moveSpeed;
+	move.x = dir.x * param->moveSpeed;
+	move.z = dir.z * param->moveSpeed;
+	//キャラクターコントローラーを使用して座標移動
+	position = characterController.Execute(move, g_gameTime->GetFrameDeltaTime());
+	
 	//向き変更
 	rotation.SetRotationYFromDirectionXZ(dir);
 	//電力消費

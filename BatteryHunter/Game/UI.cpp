@@ -158,7 +158,6 @@ void UI::Render(RenderContext& rc)
     frame[Background_frame].Draw(rc);
 
     for (int i = 0; i < MaxUI; i++)     {  font[i].Draw(rc); }
-    for (int i = 0; i < 3; i++)         {  Line[i].Draw(rc); }
 
     Gauge[Player_Gauge].Draw(rc);
     Gauge[Boss_Gauge].Draw(rc);
@@ -169,6 +168,8 @@ void UI::Render(RenderContext& rc)
     }
 
     frame[Gauge_frame].Draw(rc);
+
+    for (int i = 0; i < 3; i++) { Line[i].Draw(rc); }
 
     // Popup描画
     m_textPopupManager.Draw(rc);

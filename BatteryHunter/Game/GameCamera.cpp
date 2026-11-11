@@ -17,6 +17,17 @@ bool GameCamera::Start()
 	//プレイヤーのインスタンスを探す。
 	m_player = FindGO<Player>("player");
 
+	//初期カメラ位置変更
+	Vector3 forward =
+		m_player->GetForward();
+
+	m_toCameraPos =
+	{
+		-forward.x * 250.0f,
+		 125.0f,
+		-forward.z * 250.0f
+	};
+
 	//カメラのニアクリップとファークリップを設定する。
 	g_camera3D->SetNear(1.0f);
 	g_camera3D->SetFar(25000.0f);

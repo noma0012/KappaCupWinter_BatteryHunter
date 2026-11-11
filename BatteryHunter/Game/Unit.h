@@ -74,6 +74,8 @@ private:
 	bool hasGear = false;
 	bool hasSubGear = false;
 
+	Vector3 move;
+
 	Player* player = nullptr;
 	UI* ui;
 	Unit* target = nullptr;
