@@ -200,6 +200,10 @@ void Gauge::Update()
         if (m_rate <= 0.0f) { color=Vector4(0.4f, 0.4f, 0.4f, 1.0f); }
         else { color = Vector4(1.0f, 0.0f, 0.0f, 1.0f); }
         break;
+    case GeneratorStop:
+        //停止ゲージ
+        color = Vector4(0.0f, 0.8f, 1.0f, 1.0f);
+        break;
     case HP:
         color = Vector4( 0.0f,1.0f, 0.0f, 1.0f);
         break;

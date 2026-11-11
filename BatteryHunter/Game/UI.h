@@ -5,6 +5,7 @@ using namespace std::chrono;
 
 class Player;
 class Game;
+class Generator;
 
 class UI : public IGameObject
 {
@@ -18,9 +19,10 @@ public:
     };
     //UIゲージ用バッテリー
     enum UIBattery {
-        B_Player,
-        B_Boss,
-        B_Max
+        Player_Gauge,
+        Boss_Gauge,
+        Generator_Gauge,
+        Max_Gauge
     };
     //UI装飾
     enum UIframe {
@@ -60,8 +62,10 @@ private:
     Player* player;
     Game* game;
 
-    Gauge Battery[B_Max];
+    Gauge Gauge[Max_Gauge];
 
     // ポップアップ管理
     TextPopupManager m_textPopupManager;
+
+    Generator* generator = nullptr;
 };

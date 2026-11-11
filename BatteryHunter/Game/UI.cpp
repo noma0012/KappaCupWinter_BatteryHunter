@@ -4,6 +4,8 @@
 #include "BackGround.h"
 #include "Game.h"
 #include "Gauge.h"
+#include "Generator.h"
+
 //画面表示を管理するクラス
 UI::UI()
 {
@@ -21,15 +23,15 @@ UI::UI()
     //表示する色を設定する。
     font[Time].SetColor(g_vec4White);
 
-    //プレイヤーバッテリー仮設定
-    Battery[B_Player].Init("Assets/sprite/White.DDS", 300.0f, 30.0f);
-    Battery[B_Player].SetPosition({ -900.0f,-400.0f,0.0f });
-    Battery[B_Player].SetType(Gauge::PlayerBattery);
+    //プレイヤーバッテリー設定
+    Gauge[Player_Gauge].Init("Assets/sprite/White.DDS", 300.0f, 30.0f);
+    Gauge[Player_Gauge].SetPosition({ -900.0f,-400.0f,0.0f });
+    Gauge[Player_Gauge].SetType(Gauge::PlayerBattery);
 
     //ボスバッテリー仮設定
-    Battery[B_Boss].Init("Assets/sprite/White.DDS", 500.0f, 40.0f);
-    Battery[B_Boss].SetPosition({ -235.0f,450.0f,0.0f });
-    Battery[B_Boss].SetType(Gauge::BossBattery);
+    Gauge[Boss_Gauge].Init("Assets/sprite/White.DDS", 500.0f, 40.0f);
+    Gauge[Boss_Gauge].SetPosition({ -235.0f,450.0f,0.0f });
+    Gauge[Boss_Gauge].SetType(Gauge::BossBattery);
 
     //ライン仮設定
     Line[0].SetPosition({ -250.0f,470.0f,0.0f });
@@ -47,8 +49,14 @@ UI::UI()
     frame[Background_frame].Init("Assets/sprite/Time_frame.DDS", 320.0f, 50.0f);
     frame[Background_frame].SetPosition({ -760.0f,-400.0f,0.0f });
 
+    //発電機停止ゲージ
+    Gauge[Generator_Gauge].Init("Assets/sprite/White.DDS", 500.0f, 40.0f);
+    Gauge[Generator_Gauge].SetPosition({ -235.0f,400.0f,0.0f });
+    Gauge[Generator_Gauge].SetType(Gauge::GeneratorStop);
+
     player = FindGO<Player>("player");
     game = FindGO<Game>("game");
+    generator = FindGO<Generator>("generator");
 }
 UI::~UI()
 {
@@ -58,6 +66,8 @@ void UI::SetGame(Game* g) { game = g; }
 //更新管理
 void UI::Update()
 {
+    if (generator == nullptr) { generator = FindGO<Generator>("generator"); }
+
     SetTime();//時間更新
     SetPlayerPos();//位置座標更新
     SetBattery();//バッテリー更新
@@ -105,16 +115,25 @@ void UI::SetBattery() {
 
 
     //サイズ設定
-    Battery[B_Player].SetRate(player->GetBattery() / player->GetBatteryMax());
-    Battery[B_Boss].SetRate(bossBattery / 100.0f);
+    Gauge[Player_Gauge].SetRate(player->GetBattery() / player->GetBatteryMax());
+    Gauge[Boss_Gauge].SetRate(bossBattery / 100.0f);
 
     //電力残量表示
     swprintf_s(buffer[PlayerBattery], 32, L"%.1f", player->GetBattery());
     font[PlayerBattery].SetText(buffer[PlayerBattery]);
 
+    if (generator)
+    {
+        Gauge[Generator_Gauge].SetRate(generator->GetStopRate());
+    }
+
     //更新処理
-    Battery[B_Player].Update();
-    Battery[B_Boss].Update();
+    Gauge[Player_Gauge].Update();
+    Gauge[Boss_Gauge].Update();
+    if (generator && generator->IsPlayerInsideRange())
+    {
+        Gauge[Generator_Gauge].Update();
+    }
 }
 //ダメージポップアップ生成管理
 void UI::CreateDamagePopup(int damage,const Vector3& pos)
@@ -138,9 +157,16 @@ void UI::Render(RenderContext& rc)
     frame[Time_frame].Draw(rc);
     frame[Background_frame].Draw(rc);
 
-    for (int i = 0; i < MaxUI; i++) { font[i].Draw(rc); }
-    for (int i = 0; i < B_Max; i++) { Battery[i].Draw(rc); }
-    for (int i = 0; i < 3; i++)     { Line[i].Draw(rc); }
+    for (int i = 0; i < MaxUI; i++)     {  font[i].Draw(rc); }
+    for (int i = 0; i < 3; i++)         {  Line[i].Draw(rc); }
+
+    Gauge[Player_Gauge].Draw(rc);
+    Gauge[Boss_Gauge].Draw(rc);
+
+    if (generator && generator->IsPlayerInsideRange())
+    {
+        Gauge[Generator_Gauge].Draw(rc);
+    }
 
     frame[Gauge_frame].Draw(rc);
 

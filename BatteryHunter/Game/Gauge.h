@@ -23,6 +23,7 @@ public:
         Battery,       // バッテリー
         PlayerBattery, //プレイヤー専用バッテリー
         BossBattery,   //ボス専用バッテリー
+        GeneratorStop, //発電機停止ゲージ
         HP,            // HP
         Shield         // シールド
     };
