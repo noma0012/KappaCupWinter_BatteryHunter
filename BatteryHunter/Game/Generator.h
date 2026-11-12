@@ -33,10 +33,7 @@ public:
 		return needRepair;
 	}
 	//座標取得
-	Vector3 GetPosition()const
-	{
-		return position;
-	}
+	Vector3 GetPosition() const { return position; }
 	//停止ゲージ取得
 	float GetStopGauge()const
 	{
@@ -66,7 +63,7 @@ private:
 	PhysicsStaticObject physicsStaticObject;
 
 	//座標
-	Vector3 position = { 0.0f,0.0f,0.0f };
+	Vector3 position = { 0.0f,-13.0f,0.0f };
 
 	//状態
 	GeneratorState state = GeneratorState::Running;

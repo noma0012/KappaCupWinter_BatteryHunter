@@ -5,6 +5,7 @@
 #include "UI.h"
 #include "UnitManager.h"
 #include "BatteryManager.h"
+#include "Generator.h"
 
 //ユニットを管理するクラス
 //初期設定
@@ -74,9 +75,6 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 		hp = param->hp;
 		battery = param->battery;
 	}
-
-	//キャラクターコントローラー初期化
-	characterController.Init(50.0f, 50.0f, position);
 }
 Unit::Unit()
 {
@@ -96,16 +94,21 @@ void Unit::Update() {
 		if (param == nullptr && unitManager != nullptr) { param = &unitManager->GetParam(type); }
 	}
 	//重力
-	if (characterController.IsOnGround())
 	{
-		move.y = 0.0f;
+		if (characterController.IsOnGround())
+		{
+			position.y = 0.0f;
+		}
+		else
+		{
+			position.y -= 5.0f;
+		}
 	}
-	else
+	//充電ユニット専用処理
+	if(type==Type::Charger)
 	{
-		move.y -= 5.0f;
+		UpdateBatteryPack(); //バックパック更新処理
 	}
-
-	UpdateBatteryPack(); //バックパック更新処理
 
 	switch (status)
 	{
@@ -159,8 +162,6 @@ void Unit::Update() {
 	}
 	//ユニット押し出し処理
 	{
-		float pushTimer = 0.0f;
-
 		pushTimer+=g_gameTime->GetFrameDeltaTime();
 
 		if (pushTimer >= 0.1f)
@@ -248,8 +249,6 @@ void Unit::Move() {
 		{
 			//対象検索
 			{
-				float searchTimer = 0.0f;
-
 				searchTimer += g_gameTime->GetFrameDeltaTime();
 
 				if (searchTimer >= 0.5f)
@@ -397,12 +396,39 @@ void Unit::MoveDirection(const Vector3& dir)
 {
 	//停止
 	if (dir.LengthSq() <= 0.0001f) { return; }
+	//移動予定位置
+	Vector3 nextPos = position + dir * param->moveSpeed / 60.0;
+
+	//発電機台座めり込み防止
+	{
+		Generator* generator = FindGO<Generator>("generator");
+		if (generator != nullptr)
+		{
+			Vector3 diff = nextPos - generator->GetPosition();
+			const float generatorRadius = 110.0f + radius;
+			if (diff.LengthSq() <= generatorRadius * generatorRadius)
+			{
+				//発電機台座範囲
+				return;
+			}
+		}
+	}
+
+	//マップ外移動防止
+	{
+		const float mapLimit = 3950.0f;
+		if (nextPos.x > mapLimit ||
+			nextPos.x < -mapLimit ||
+			nextPos.z >  mapLimit ||
+			nextPos.z < -mapLimit)
+		{
+			return;
+		}
+	}
+
 	//移動
-	move.x = dir.x * param->moveSpeed;
-	move.z = dir.z * param->moveSpeed;
-	//キャラクターコントローラーを使用して座標移動
-	position = characterController.Execute(move, g_gameTime->GetFrameDeltaTime());
-	
+	position = nextPos;
+
 	//向き変更
 	rotation.SetRotationYFromDirectionXZ(dir);
 	//電力消費

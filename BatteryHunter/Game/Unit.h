@@ -39,6 +39,7 @@ private:
 	void UpdateBatteryPack(); //バックパック更新処理
 	void SearchChargeTarget();//充電対象検索
 	void Charge();//充電処理
+
 	//Vector3
 	Vector3 position;      //位置(ユニット)
 	Vector3 direction;     //方向(Vector3)
@@ -74,7 +75,8 @@ private:
 	bool hasGear = false;
 	bool hasSubGear = false;
 
-	Vector3 move;
+	float pushTimer = 0.0f;
+	float searchTimer = 0.0f;
 
 	Player* player = nullptr;
 	UI* ui;
