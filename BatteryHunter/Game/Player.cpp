@@ -248,25 +248,39 @@ void Player::Shoot()
 {
 	if (!g_pad[0]->IsPress(enButtonB)) { return; }
 	if (m_shotTimer > 0.0f) { return; }
+
 	BulletManager* bulletManager =
 		FindGO<BulletManager>("bulletManager");
+
 	if (bulletManager == nullptr) { return; }
+
+	Vector3 forward = GetForward();
+
+	//銃口位置
+	Vector3 muzzlePos = position;
+	muzzlePos += forward * 60.0f;
+	muzzlePos.y += 40.0f;
+
 	bulletManager->Fire(
-		position,
-		GetForward(),
+		muzzlePos,
+		forward,
 		m_bulletType
 	);
+
 	m_shotTimer = m_shotInterval;
+
 	switch (m_bulletType)
 	{
 	case Player::BulletType::Normal:
-		ConsumeBattery(0.1);
+		ConsumeBattery(0.1f);
 		break;
+
 	case Player::BulletType::EMP:
-		ConsumeBattery(0.5);
+		ConsumeBattery(0.5f);
 		break;
+
 	case Player::BulletType::Drain:
-		ConsumeBattery(0.3);
+		ConsumeBattery(0.3f);
 		break;
 	}
 }

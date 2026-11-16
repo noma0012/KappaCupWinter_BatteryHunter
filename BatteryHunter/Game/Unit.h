@@ -6,6 +6,7 @@ using namespace std;
 
 class Player;
 class UI;
+class Generator;
 
 class Unit : public IGameObject
 {
@@ -27,7 +28,6 @@ private:
 	void Render(RenderContext& rc); //描画処理
 	void Direction();               //方向処理
 	void Move();                    //移動処理
-	void PushUnit();      //ユニット押し出し処理
 	void PushPlayer();    //プレイヤー押し出し処理
 	void SelfRepair();    //自己修復
 	void Patrol();        //巡回
@@ -75,7 +75,6 @@ private:
 	bool hasGear = false;
 	bool hasSubGear = false;
 
-	float pushTimer = 0.0f;
 	float searchTimer = 0.0f;
 
 	Player* player = nullptr;
@@ -83,5 +82,6 @@ private:
 	Unit* target = nullptr;
 	UnitManager* unitManager = nullptr;
 	const UnitParam* param = nullptr;
+	Generator* generator = nullptr;
 };
 

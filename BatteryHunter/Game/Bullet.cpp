@@ -8,7 +8,7 @@
 Bullet::Bullet() 
 {
 	//弾読み込み
-	m_modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
+	m_modelRender.Init("Assets/modelData/Battery/bullet_normal.tkm");
 
 	//UnitManager取得
 	m_unitManager = FindGO<UnitManager>("unitManager");
@@ -28,6 +28,12 @@ void Bullet::Fire(
 	//発射方向
 	m_direction = dir;
 	m_direction.Normalize();
+
+	//進行方向へ回転
+	m_rotation.SetRotationYFromDirectionXZ(m_direction);
+
+	m_modelRender.SetRotation(m_rotation);
+
 	m_bulletType = type;     //弾種類
 	m_speed = 1500.0f;       //移動速度
 	m_lifeTime = 3.0f;       //生存時間

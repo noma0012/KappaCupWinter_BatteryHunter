@@ -16,12 +16,15 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 	///作成物(オブジェクト)は
 	///ボックスのみで構成する
 	///━━━━━━━━━━━
+	
+	//モデル読み込み
+	modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
+	StopModel.Init("Assets/modelData/Unit/Unit_Enemy_Stop.tkm");
+
 	switch (type)
 	{
 		//通常ユニット
 	case Type::Basic:
-		//基本ユニット読み込み
-		modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
 		//素手読み込み
 		gearModel.Init("Assets/modelData/Unit/Fist.tkm");
 		subGearModel.Init("Assets/modelData/Unit/Fist.tkm");
@@ -32,8 +35,6 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 		hasSubGear = true;
 		break;
 	case Type::Charger:
-		//充電ユニット読み込み
-		modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
 		//充電バックパック(0～5)
 		batteryPack[0].Init("Assets/modelData/Battery/charge_pack_0.tkm");
 		batteryPack[1].Init("Assets/modelData/Battery/charge_pack_1.tkm");
@@ -45,8 +46,6 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 		break;
 		//特殊ユニット
 	case Type::Repair:
-		//修理ユニット読み込み
-		modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
 		//電動ドリル
 		gearModel.Init("Assets/modelData/Battery/repair_tool_drill.tkm");
 		//スパナ
@@ -60,13 +59,14 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 		modelRender.Init("Assets/modelData/Unit/Unit_Enemy_Boss.tkm");
 		break;
 	}
-	StopModel.Init("Assets/modelData/Unit/Unit_Enemy_Stop.tkm");
 	modelRender.SetPosition(position);//座標設定
 	modelRender.Update();             //更新処理
 
 	player = FindGO<Player>("player");
 	ui = FindGO<UI>("ui");
 	unitManager = FindGO<UnitManager>("unitManager");
+	generator = FindGO<Generator>("generator");
+
 	//性能取得
 	if (unitManager)
 	{
@@ -75,6 +75,8 @@ void Unit::SetUp(Type type, float x, float y, float z) {
 		hp = param->hp;
 		battery = param->battery;
 	}
+	//キャラコンを初期化
+	//characterController.Init(50.0f, 50.0f, position);
 }
 Unit::Unit()
 {
@@ -92,6 +94,7 @@ void Unit::Update() {
 		if (ui == nullptr) { ui = FindGO<UI>("ui"); }
 		if (unitManager == nullptr) { unitManager = FindGO<UnitManager>("unitManager"); }
 		if (param == nullptr && unitManager != nullptr) { param = &unitManager->GetParam(type); }
+		if (generator == nullptr) { generator = FindGO<Generator>("generator"); }
 	}
 	//重力
 	{
@@ -160,32 +163,9 @@ void Unit::Update() {
 	default:
 		break;
 	}
-	//ユニット押し出し処理
-	{
-		pushTimer+=g_gameTime->GetFrameDeltaTime();
-
-		if (pushTimer >= 0.1f)
-		{
-			PushUnit();
-			pushTimer = 0.0f;
-		}
-	}
 	
 	PushPlayer();//プレイヤー押し出し処理
 	UpdateGear();//装備位置更新処理
-	//仮(不必要・テスト)
-	if (GetAsyncKeyState('1') & 0x0001)
-	{
-		TakeDamage(10);
-	}
-	if (GetAsyncKeyState('2') & 0x0001)
-	{
-		status = Status::SelfRepair;
-	}
-	if (GetAsyncKeyState('3') & 0x0001)
-	{
-		battery = 0.0f;
-	}
 
 	//バッテリー切れ
 	if (battery <= 0.0f)
@@ -273,43 +253,6 @@ void Unit::Move() {
 	case Type::Repair:
 		Patrol();
 		break;
-	}
-}
-//ユニット押し出し処理
-void Unit::PushUnit()
-{
-	//ユニット管理クラスが存在しない場合
-	if (unitManager == nullptr) { return; }
-
-	//近くのユニットのみ取得( 例：検索範囲 = 200.0f )
-	auto nearUnits = unitManager->GetNearUnits(position, 200.0f);
-	//近距離ユニットのみ処理
-	for (auto other : nearUnits)
-	{
-		//自分自身は除外
-		if (other == this) { continue; }
-		//相手との距離ベクトル
-		Vector3 diff = position - other->position;
-		//接触距離
-		float limit = radius + other->radius;
-		//距離の二乗
-		float distSq = diff.LengthSq();
-		//接触判定
-		if (distSq < limit * limit)
-		{
-			//ゼロ除算防止
-			if (distSq > 0.0001f)
-			{
-				float dist = sqrtf(distSq);
-				//方向を正規化
-				diff /= dist;
-				//押し出し量
-				float push = (limit - dist) * 0.5f;
-				//お互い半分ずつ押し出す
-				position += diff * push;
-				other->position -= diff * push;
-			}
-		}
 	}
 }
 //プレイヤー押し出し処理
@@ -401,31 +344,90 @@ void Unit::MoveDirection(const Vector3& dir)
 
 	//発電機台座めり込み防止
 	{
-		Generator* generator = FindGO<Generator>("generator");
 		if (generator != nullptr)
 		{
 			Vector3 diff = nextPos - generator->GetPosition();
 			const float generatorRadius = 110.0f + radius;
-			if (diff.LengthSq() <= generatorRadius * generatorRadius)
+			float distSq = diff.LengthSq();
+			if (distSq <= generatorRadius * generatorRadius)
 			{
 				//発電機台座範囲
-				return;
+				float dist = sqrtf(distSq);
+				if (dist > 0.0001f)
+				{
+					diff /= dist;
+					nextPos = generator->GetPosition() + diff * generatorRadius;
+				}
 			}
 		}
 	}
 
-	//マップ外移動防止
+	//マップ外補正
 	{
-		const float mapLimit = 3950.0f;
-		if (nextPos.x > mapLimit ||
-			nextPos.x < -mapLimit ||
-			nextPos.z >  mapLimit ||
-			nextPos.z < -mapLimit)
+		const float mapLimit = 3950.0f - radius;
+		//x座標補正
+		if (nextPos.x > mapLimit)
 		{
-			return;
+			nextPos.x = mapLimit;
+		}
+		else if (nextPos.x < -mapLimit)
+		{
+			nextPos.x = -mapLimit;
+		}
+		//z座標補正
+		if (nextPos.z > mapLimit)
+		{
+			nextPos.z = mapLimit;
+		}
+		else if (nextPos.z < -mapLimit)
+		{
+			nextPos.z = -mapLimit;
 		}
 	}
+	//ユニットめり込み防止
+	{
+		if (unitManager)
+		{
+			auto nearUnits =
+				unitManager->GetNearUnits(
+					nextPos,
+					80.0f
+				);
 
+			for (auto other : nearUnits)
+			{
+				if (other == this)
+				{
+					continue;
+				}
+
+				Vector3 diff =
+					nextPos - other->GetPosition();
+
+				float limit =
+					radius +
+					other->GetRadius();
+
+				float distSq =
+					diff.LengthSq();
+
+				if (distSq < limit * limit)
+				{
+					float dist =
+						sqrtf(distSq);
+
+					if (dist > 0.0001f)
+					{
+						diff /= dist;
+
+						nextPos =
+							other->GetPosition() +
+							diff * limit;
+					}
+				}
+			}
+		}
+	}
 	//移動
 	position = nextPos;
 
