@@ -10,10 +10,57 @@
 #include "UnitManager.h"
 #include "BatteryManager.h"
 #include "Generator.h"
+#include "nature/SkyCube.h"
+#include "graphics/RenderingEngine.h"
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 空(スカイキューブ)の設定
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+void Game::InitSky()
+{
+	//既存のスカイキューブを削除
+	DeleteGO(m_skyCube);
+
+	//新しいスカイキューブを生成
+	m_skyCube = NewGO<SkyCube>(0,"skycube");
+
+	//スカイキューブ自体の明るさ
+	//1.0f = 標準
+	//2.0f = 明るい
+	m_skyCube->SetLuminance(0.2f);
+
+	//空の種類を設定
+	m_skyCube->SetType(
+		enSkyCubeType_Night
+	);
+
+	//━━━━━━━━━━━━━━━━━━━━━━
+	// 環境光(IBL)設定
+	// 空のテクスチャを利用して
+	// ステージ全体の明るさを決定する
+	//━━━━━━━━━━━━━━━━━━━━━━
+	g_renderingEngine->SetAmbientByIBLTexture(
+		m_skyCube->GetTextureFilePath(),
+		0.2f	//環境光の強さ
+	);
+
+	//━━━━━━━━━━━━━━━━━━━━━━
+	// ディレクションライト無効化
+	// 強い影や太陽光を消す
+	//━━━━━━━━━━━━━━━━━━━━━━
+	g_renderingEngine->SetDirectionLight(
+		0,			 //ライト番号
+		g_vec3Zero,  //方向
+		g_vec3Zero   //色(0で無効)
+	);
+}
 
 //ゲームを管理するクラス
 bool Game::Start()
 {
+	//空生成
+	InitSky();
+
 	///━━━━━━━━━━━━━━━━━━━━━
 	/// ROM作成時の注意点
 	/// DebugにするとFPSが表示される
@@ -40,7 +87,7 @@ bool Game::Start()
 	//ユニット管理クラス作成
 	unitManager_Ins = NewGO<UnitManager>(0, "unitManager");
 	//ユニット作成
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 3; i++) {
 		unitManager_Ins->SpawnUnit(Type::Basic, 1000.0f, 0.0f, 1000.0f);
 		unitManager_Ins->SpawnUnit(Type::Charger, 1000.0f, 0.0f, -1000.0f);
 		unitManager_Ins->SpawnUnit(Type::Repair, -1000.0f, 0.0f, 1000.0f);
@@ -66,7 +113,8 @@ Game::~Game() {
 	DeleteGO(ui_Ins);
 	DeleteGO(unitManager_Ins);
 	DeleteGO(generator_Ins);
-	
+	DeleteGO(m_skyCube);
+
 }
 void Game::Update()
 {

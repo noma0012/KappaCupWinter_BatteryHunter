@@ -23,6 +23,8 @@ public:
 	void Render(RenderContext& rc);
 	void SetUnit(Type type, float x, float y, float z);
 	void RemoveUnit(Unit* unit);
+	//空生成
+	void InitSky();
 	
 private:
 
@@ -37,5 +39,7 @@ private:
 	GameClear* gameclear_Ins;
 	UnitManager* unitManager_Ins;
 	Generator* generator_Ins;
+	//スカイキューブ
+	SkyCube* m_skyCube = nullptr;
 };
 
