@@ -27,22 +27,20 @@ void Game::InitSky()
 	//スカイキューブ自体の明るさ
 	//1.0f = 標準
 	//2.0f = 明るい
-	m_skyCube->SetLuminance(0.2f);
+	m_skyCube->SetLuminance(0.5f);
 
 	//空の種類を設定
-	m_skyCube->SetType(
-		enSkyCubeType_Night
-	);
+	m_skyCube->SetType(enSkyCubeType_Night);
 
 	//━━━━━━━━━━━━━━━━━━━━━━
 	// 環境光(IBL)設定
 	// 空のテクスチャを利用して
 	// ステージ全体の明るさを決定する
 	//━━━━━━━━━━━━━━━━━━━━━━
-	g_renderingEngine->SetAmbientByIBLTexture(
-		m_skyCube->GetTextureFilePath(),
-		0.2f	//環境光の強さ
-	);
+	//g_renderingEngine->SetAmbientByIBLTexture(
+	//	m_skyCube->GetTextureFilePath(),
+	//	0.2f	//環境光の強さ
+	//);
 
 	//━━━━━━━━━━━━━━━━━━━━━━
 	// ディレクションライト無効化

@@ -246,7 +246,7 @@ void Player::NextBullet()
 //射撃
 void Player::Shoot()
 {
-	if (!g_pad[0]->IsPress(enButtonB)) { return; }
+	if (!g_pad[0]->IsPress(enButtonX)) { return; }
 	if (m_shotTimer > 0.0f) { return; }
 
 	BulletManager* bulletManager =
