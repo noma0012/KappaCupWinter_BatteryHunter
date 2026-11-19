@@ -1,195 +1,234 @@
 #include "stdafx.h"
 #include "Unit.h"
+
 #include "Player.h"
-#include "Game.h"
 #include "UI.h"
-#include "UnitManager.h"
-#include "BatteryManager.h"
 #include "Generator.h"
+#include "BatteryManager.h"
 
-//ユニットを管理するクラス
-//初期設定
-void Unit::SetUp(Type type, float x, float y, float z) {
-	this->type = type;
-	position = { x,y,z };
-	///━━━━━━━━━━━
-	///作成物(オブジェクト)は
-	///ボックスのみで構成する
-	///━━━━━━━━━━━
-	
-	//モデル読み込み
-	modelRender.Init("Assets/modelData/Unit/Unit_Enemy.tkm");
-	StopModel.Init("Assets/modelData/Unit/Unit_Enemy_Stop.tkm");
+#pragma region コンストラクタ
 
-	switch (type)
-	{
-		//通常ユニット
-	case Type::Basic:
-		//素手読み込み
-		gearModel.Init("Assets/modelData/Unit/Fist.tkm");
-		subGearModel.Init("Assets/modelData/Unit/Fist.tkm");
-		//機能停止時の素手読み込み
-		stopGearModel.Init("Assets/modelData/Unit/Stop_Fist.tkm");
-		stopSubGearModel.Init("Assets/modelData/Unit/Stop_Fist.tkm");
-		hasGear = true;
-		hasSubGear = true;
-		break;
-	case Type::Charger:
-		//充電バックパック(0～5)
-		batteryPack[0].Init("Assets/modelData/Battery/charge_pack_0.tkm");
-		batteryPack[1].Init("Assets/modelData/Battery/charge_pack_1.tkm");
-		batteryPack[2].Init("Assets/modelData/Battery/charge_pack_2.tkm");
-		batteryPack[3].Init("Assets/modelData/Battery/charge_pack_3.tkm");
-		batteryPack[4].Init("Assets/modelData/Battery/charge_pack_4.tkm");
-		batteryPack[5].Init("Assets/modelData/Battery/charge_pack_5.tkm");
-		hasGear = true;
-		break;
-		//特殊ユニット
-	case Type::Repair:
-		//電動ドリル
-		gearModel.Init("Assets/modelData/Battery/repair_tool_drill.tkm");
-		//スパナ
-		subGearModel.Init("Assets/modelData/Battery/repair_tool_spanner.tkm");
-		hasGear = true;
-		hasSubGear = true;
-		break;
-		//ボスユニット
-	case Type::Boss:
-		//ボスユニット読み込み
-		modelRender.Init("Assets/modelData/Unit/Unit_Enemy_Boss.tkm");
-		break;
-	}
-	modelRender.SetPosition(position);//座標設定
-	modelRender.Update();             //更新処理
-
-	player = FindGO<Player>("player");
-	ui = FindGO<UI>("ui");
-	unitManager = FindGO<UnitManager>("unitManager");
-	generator = FindGO<Generator>("generator");
-
-	//性能取得
-	if (unitManager)
-	{
-		param = &unitManager->GetParam(type);
-
-		hp = param->hp;
-		battery = param->battery;
-	}
-	//キャラコンを初期化
-	//characterController.Init(50.0f, 50.0f, position);
-}
 Unit::Unit()
 {
 
 }
+
 Unit::~Unit()
 {
 
 }
+
+#pragma endregion
+
+#pragma region 初期化
+
+//初期設定
+void Unit::SetUp(
+	Type type,
+	float x,
+	float y,
+	float z
+)
+{
+	//種類設定
+	this->type = type;
+
+	//初期座標設定
+	position = { x,y,z };
+
+	//関連オブジェクト取得
+	FindObjects();
+
+	//モデル初期化
+	InitModel();
+
+	//性能設定
+	InitParameter();
+
+	//モデルへ位置反映
+	modelRender.SetPosition(position);
+	modelRender.Update();
+
+	StopModel.SetPosition(position);
+	StopModel.Update();
+}
+
+//モデル初期化
+void Unit::InitModel()
+{
+	switch (type)
+	{
+	case Type::Basic:
+		//通常モデル
+		modelRender.Init("Assets/modelData/Unit/Unit_Normal.tkm");
+		//停止モデル
+		StopModel.Init("Assets/modelData/Unit/Stop_Unit_Normal.tkm");
+		break;
+	case Type::Charger:
+		//充電ユニット専用モデル(0～5)
+		batteryPack[0].Init("Assets/modelData/Unit/Unit_charge_pack_0.tkm");
+		batteryPack[1].Init("Assets/modelData/Unit/Unit_charge_pack_1.tkm");
+		batteryPack[2].Init("Assets/modelData/Unit/Unit_charge_pack_2.tkm");
+		batteryPack[3].Init("Assets/modelData/Unit/Unit_charge_pack_3.tkm");
+		batteryPack[4].Init("Assets/modelData/Unit/Unit_charge_pack_4.tkm");
+		batteryPack[5].Init("Assets/modelData/Unit/Unit_charge_pack_5.tkm");
+		break;
+	case Type::Repair:
+		//修理ユニット
+		modelRender.Init("Assets/modelData/Unit/Unit_repair.tkm");
+		StopModel.Init("Assets/modelData/Unit/Stop_Unit_repair.tkm");
+		break;
+	case Type::Boss:
+		//ボスユニット
+		modelRender.Init("Assets/modelData/Unit/Unit_Boss.tkm");
+		StopModel.Init("Assets/modelData/Unit/Stop_Unit_Boss.tkm");
+		break;
+	}
+}
+//性能初期化
+void Unit::InitParameter()
+{
+	//管理クラスなし
+	if (unitManager == nullptr) { return; }
+
+	//性能取得
+	param = &unitManager->GetParam(type);
+
+	//初期HP
+	hp = param->hp;
+
+	//初期バッテリー
+	battery = param->battery;
+}
+//参照取得
+void Unit::FindObjects()
+{
+	//プレイヤー
+	if (player == nullptr) { player = FindGO<Player>("player"); }
+	//UI
+	if (ui == nullptr) { ui = FindGO<UI>("ui"); }
+	//ユニット管理
+	if (unitManager == nullptr) { unitManager = FindGO<UnitManager>("unitManager"); }
+	//発電機
+	if (generator == nullptr) { generator = FindGO<Generator>("generator"); }
+}
+
+#pragma endregion
+
+#pragma region 更新
 //更新処理
-void Unit::Update() {
-	//再取得
+void Unit::Update()
+{
+	//参照再取得
+	FindObjects();
+
+	//重力処理
+	UpdateGravity();
+
+	//充電ユニット専用
+	if (type == Type::Charger)
 	{
-		if (player == nullptr) { player = FindGO<Player>("player"); }
-		if (ui == nullptr) { ui = FindGO<UI>("ui"); }
-		if (unitManager == nullptr) { unitManager = FindGO<UnitManager>("unitManager"); }
-		if (param == nullptr && unitManager != nullptr) { param = &unitManager->GetParam(type); }
-		if (generator == nullptr) { generator = FindGO<Generator>("generator"); }
-	}
-	//重力
-	{
-		if (characterController.IsOnGround())
-		{
-			position.y = 0.0f;
-		}
-		else
-		{
-			position.y -= 5.0f;
-		}
-	}
-	//充電ユニット専用処理
-	if(type==Type::Charger)
-	{
-		UpdateBatteryPack(); //バックパック更新処理
+		UpdateBatteryPack();
 	}
 
+	//状態更新
 	switch (status)
 	{
 	case Status::Normal:
-		//通常
-		Direction(); //方向処理
-		//攻撃範囲内の場合
-		if (distance <= param->attackRange)
-		{
-			Attack();//攻撃処理
-		}
-		else
-		{
-			Move(); //移動処理
-		}
-		
+		UpdateNormal();
 		break;
 	case Status::SelfRepair:
-		//自己修復
 		SelfRepair();
 		break;
 	case Status::Stop:
-		//機能停止
-		//タイマー加算
-		stopTimer += g_gameTime->GetFrameDeltaTime();
-
-		if (stopTimer >= 60.0f)
-		{
-			//ドロップ
-			auto batteryManager = FindGO<BatteryManager>("batteryManager");
-			if (batteryManager)
-			{
-				batteryManager->SpawnBattery(position, rotation);
-			}
-			//消滅
-			if (unitManager) {
-				unitManager->RemoveUnit(this);
-			}
-			return;
-		}
-
+		UpdateStop();
 		break;
 	case Status::Charging:
-		//充電中
+		//発電機で充電
+		ChargeGenerator();
 		break;
 	case Status::Repairing:
-		//修理中
-		break;
-	default:
 		break;
 	}
-	
-	PushPlayer();//プレイヤー押し出し処理
-	UpdateGear();//装備位置更新処理
 
+	//押し出し処理
+	PushPlayer();
+	PushUnit();
+
+	//モデル更新
+	UpdateModel();
+}
+//通常状態更新
+void Unit::UpdateNormal()
+{
+	//方向計算
+	Direction();
+
+	//攻撃判定
+	if (distance <= param->attackRange)
+	{
+		Attack();
+	}
+	else
+	{
+		Move();
+	}
 	//バッテリー切れ
 	if (battery <= 0.0f)
 	{
 		battery = 0.0f;
+
 		status = Status::Stop;
 	}
+}
 
-	//通常モデル
-	modelRender.SetRotation(rotation);//回転更新
-	modelRender.SetPosition(position);//位置更新
-	//機能停止モデル
-	StopModel.SetRotation(rotation);
-	StopModel.SetPosition(position);
-	//モデル更新
-	modelRender.Update();
-	gearModel.Update();
-	subGearModel.Update();
-
-	StopModel.Update();
-	stopGearModel.Update();
-	stopSubGearModel.Update();
+void Unit::UpdateStop()
+{
 
 }
+
+//重力処理
+void Unit::UpdateGravity()
+{
+	//接地中
+	if (characterController.IsOnGround())
+	{
+		position.y = 0.0f;
+	}
+	else
+	{
+		//落下
+		position.y -= 5.0f;
+	}
+}
+//モデル更新
+void Unit::UpdateModel()
+{
+	//通常モデル
+	modelRender.SetPosition(position);
+	modelRender.SetRotation(rotation);
+
+	//停止モデル
+	StopModel.SetPosition(position);
+	StopModel.SetRotation(rotation);
+
+	//モデル更新
+	modelRender.Update();
+	StopModel.Update();
+
+	//充電ユニット
+	if (type == Type::Charger)
+	{
+		batteryPack[batteryLevel].SetPosition(position);
+		batteryPack[batteryLevel].SetRotation(rotation);
+		batteryPack[batteryLevel].Update();
+	}
+}
+
+#pragma endregion
+
+#pragma region 移動
+
 //方向処理
 void Unit::Direction() {
 	if (player == nullptr) { return; }
@@ -202,6 +241,7 @@ void Unit::Direction() {
 	//方向変更
 	//rotation.SetRotationYFromDirectionXZ(direction);
 }
+
 //移動処理
 void Unit::Move() {
 
@@ -233,7 +273,7 @@ void Unit::Move() {
 
 				if (searchTimer >= 0.5f)
 				{
-					
+
 					SearchChargeTarget();
 					searchTimer = 0.0f;
 				}
@@ -255,85 +295,7 @@ void Unit::Move() {
 		break;
 	}
 }
-//プレイヤー押し出し処理
-void Unit::PushPlayer() {
-	//プレイヤーが存在しない場合は終了
-	if (player == nullptr) { return; }
-	//プレイヤーとの距離ベクトル
-	Vector3 diff = position - player->GetPosition();
-	//接触判定距離
-	float limit = radius + playerRadius;
-	//距離の二乗
-	float distSq = diff.LengthSq();
-	//接触しているか判定
-	if (distSq < limit * limit) {
-		//実際の距離
-		float dist = sqrtf(distSq);
-		//ゼロ除算防止
-		if (dist > 0.01f) {
-			//方向を正規化
-			diff.Normalize();
-			//めり込み量
-			float push = limit - dist;
-			//ユニットのみ押し出す
-			position += diff * push;
-			// お互い半分ずつ押し出す(強くする場合0.5fを0.8fへ・弱くする場合は0.5fを0.2fへ)
-			//position += diff * (push * 0.5f);//プレイヤー押し出し量
-			//player->position -= diff * (push * 0.5f);//ユニット押し出し量
-		}
-	}
-}
-//ダメージ処理
-void Unit::TakeDamage(int damage)
-{
-	hp -= damage;
-	if (hp <= 0)
-	{
-		hp = 0;
 
-		//自己修復状態へ
-		status = Status::SelfRepair;
-		return;
-	}
-	Vector3 popupPos = position;
-
-	//頭上へ表示
-	popupPos.y += 100.0f;
-
-	ui->CreateDamagePopup(
-		damage,
-		popupPos
-	);
-}
-//自己修復
-void Unit::SelfRepair()
-{
-	//一秒計測
-	selfRepairTimer += g_gameTime->GetFrameDeltaTime();
-	if (selfRepairTimer >= 1.0f)
-	{
-		selfRepairTimer = 0.0f;
-
-		//HP回復
-		hp += 5;
-
-		//バッテリー消費
-		battery -= 0.5f;
-	}
-
-	//バッテリー切れ
-	if (battery <= 0.0f) {
-		battery = 0.0f;
-		status = Status::Stop;
-		return;
-	}
-	//修復完了
-	if (hp >= 100)
-	{
-		hp = 100;
-		status = Status::Normal;
-	}
-}
 //移動共通処理
 void Unit::MoveDirection(const Vector3& dir)
 {
@@ -436,28 +398,7 @@ void Unit::MoveDirection(const Vector3& dir)
 	//電力消費
 	battery -= param->moveBatteryCost * g_gameTime->GetFrameDeltaTime();
 }
-//プレイヤー追跡
-void Unit::Chase()
-{
-	//攻撃範囲
-	if (distance <= param->attackRange)
-	{
-		return;
-	}
-	//プレイヤーへ向く
-	rotation.SetRotationYFromDirectionXZ(direction);
 
-	MoveDirection(direction);
-}
-//発電機へ退避
-void Unit::Escape()
-{
-	Vector3 generatorPos = { 0.0f,0.0f,0.0f };
-	Vector3 dir = generatorPos - position;
-	if (dir.LengthSq() <= 0.0001f) { return; }
-	dir.Normalize();
-	MoveDirection(dir);
-}
 //巡回
 void Unit::Patrol()
 {
@@ -465,7 +406,7 @@ void Unit::Patrol()
 	patrolTimer += g_gameTime->GetFrameDeltaTime();
 	//巡回地点未設定または到着した場合
 	Vector3 dir = patrolTarget - position;
-	if (patrolTimer >= 5.0f|| dir.LengthSq() <= 100.0f)
+	if (patrolTimer >= 5.0f || dir.LengthSq() <= 100.0f)
 	{
 		//タイマーリセット
 		patrolTimer = 0.0f;
@@ -485,6 +426,114 @@ void Unit::Patrol()
 	//共通移動処理
 	MoveDirection(dir);
 }
+
+//プレイヤー追跡
+void Unit::Chase()
+{
+	//攻撃範囲
+	if (distance <= param->attackRange)
+	{
+		return;
+	}
+	//プレイヤーへ向く
+	rotation.SetRotationYFromDirectionXZ(direction);
+
+	MoveDirection(direction);
+}
+
+//発電機へ移動
+void Unit::Escape()
+{
+	if (generator == nullptr) { return; }
+
+	Vector3 generatorPos = generator->GetPosition();
+
+	Vector3 dir = generatorPos - position;
+
+	float dist = dir.Length();
+
+	//到着
+	if (dist <= 150.0f)
+	{
+		status = Status::Charging;
+		return;
+	}
+
+	dir.Normalize();
+
+	MoveDirection(dir);
+}
+
+//プレイヤー押し出し処理
+void Unit::PushPlayer() {
+	//プレイヤーが存在しない場合は終了
+	if (player == nullptr) { return; }
+	//プレイヤーとの距離ベクトル
+	Vector3 diff = position - player->GetPosition();
+	//接触判定距離
+	float limit = radius + playerRadius;
+	//距離の二乗
+	float distSq = diff.LengthSq();
+	//接触しているか判定
+	if (distSq < limit * limit) {
+		//実際の距離
+		float dist = sqrtf(distSq);
+		//ゼロ除算防止
+		if (dist > 0.01f) {
+			//方向を正規化
+			diff.Normalize();
+			//めり込み量
+			float push = limit - dist;
+			//ユニットのみ押し出す
+			position += diff * push;
+			// お互い半分ずつ押し出す(強くする場合0.5fを0.8fへ・弱くする場合は0.5fを0.2fへ)
+			//position += diff * (push * 0.5f);//プレイヤー押し出し量
+			//player->position -= diff * (push * 0.5f);//ユニット押し出し量
+		}
+	}
+}
+
+//ユニット押し出し処理
+void Unit::PushUnit()
+{
+	//ユニット管理クラスが存在しない場合
+	if (unitManager == nullptr) { return; }
+
+	//近くのユニットのみ取得( 例：検索範囲 = 200.0f )
+	auto nearUnits = unitManager->GetNearUnits(position, 200.0f);
+	//近距離ユニットのみ処理
+	for (auto other : nearUnits)
+	{
+		//自分自身は除外
+		if (other == this) { continue; }
+		//相手との距離ベクトル
+		Vector3 diff = position - other->position;
+		//接触距離
+		float limit = radius + other->radius;
+		//距離の二乗
+		float distSq = diff.LengthSq();
+		//接触判定
+		if (distSq < limit * limit)
+		{
+			//ゼロ除算防止
+			if (distSq > 0.0001f)
+			{
+				float dist = sqrtf(distSq);
+				//方向を正規化
+				diff /= dist;
+				//押し出し量
+				float push = (limit - dist) * 0.5f;
+				//お互い半分ずつ押し出す
+				position += diff * push;
+				other->position -= diff * push;
+			}
+		}
+	}
+}
+#pragma endregion
+
+#pragma region 戦闘
+
 //攻撃処理
 void Unit::Attack()
 {
@@ -501,86 +550,75 @@ void Unit::Attack()
 	//タイマーリセット
 	attackTimer = 0.0f;
 	//プレイヤーへダメージ
-	player->Damage( param->attackPower );
+	player->Damage(param->attackPower);
 	//攻撃時バッテリー消費
 	battery -= param->attackBatteryCost;
 
 }
-//装備位置更新処理
-void Unit::UpdateGear()
+
+#pragma endregion
+
+#pragma region 状態
+
+//ダメージ処理
+void Unit::TakeDamage(int damage)
 {
-	//装備位置設定
-	switch (type)
+	hp -= damage;
+	if (hp <= 0)
 	{
-	case Type::Basic:
-	{
-		//右拳
-		Vector3 rightPos = position;
-		Vector3 rightHand = { 40.0f,20.0f,30.0f };
-		rotation.Apply(rightHand);
-		rightPos += rightHand;
+		hp = 0;
 
-		//左拳
-		Vector3 leftPos = position;
-		Vector3 leftHand = { -40.0f,20.0f,30.0f };
-		rotation.Apply(leftHand);
-		leftPos += leftHand;
+		//機能停止状態
+		if (status == Status::Stop){ return;}
 
-		if (status != Status::Stop)
-		{
-			//通常時の素手
-			gearModel.SetPosition(rightPos);
-			gearModel.SetRotation(rotation);
-			subGearModel.SetPosition(leftPos);
-			subGearModel.SetRotation(rotation);
-		}
-		else
-		{
-			//機能停止時の素手
-			stopGearModel.SetPosition(rightPos);
-			stopGearModel.SetRotation(rotation);
-			stopSubGearModel.SetPosition(leftPos);
-			stopSubGearModel.SetRotation(rotation);
-		}
+		//自己修復状態へ
+		status = Status::SelfRepair;
+		return;
 	}
-	break;
-	case Type::Charger:
+	Vector3 popupPos = position;
+
+	//頭上へ表示
+	popupPos.y += 100.0f;
+
+	ui->CreateDamagePopup(
+		damage,
+		popupPos
+	);
+}
+//自己修復
+void Unit::SelfRepair()
+{
+	//一秒計測
+	selfRepairTimer += g_gameTime->GetFrameDeltaTime();
+	if (selfRepairTimer >= 1.0f)
 	{
-		//バックパック
-		Vector3 gearPos = position;
-		Vector3 back = { 0.0f,0.0f,-0.4f };
-		rotation.Apply(back);
-		gearPos += back;
-		for (int i = 0; i < 6; i++)
-		{
-			batteryPack[i].SetPosition(gearPos);
-			batteryPack[i].SetRotation(rotation);
-			batteryPack[i].Update();
-		}
+		selfRepairTimer = 0.0f;
+
+		//HP回復
+		hp += 5;
+
+		//バッテリー消費
+		battery -= 0.5f;
 	}
-	break;
-	case Type::Repair:
+
+	//バッテリー切れ
+	if (battery <= 0.0f) {
+		battery = 0.0f;
+		status = Status::Stop;
+		return;
+	}
+	//修復完了
+	if (hp >= 100)
 	{
-		//ドリル(右手)
-		Vector3 drillPos = position;
-		Vector3 right = { 40.0f,20.0f,30.0f };
-		rotation.Apply(right);
-		drillPos += right;
-		gearModel.SetPosition(drillPos);
-		gearModel.SetRotation(rotation);
-		//スパナ(左手)
-		Vector3 wrenchPos = position;
-		Vector3 left = { -40.0f,20.0f,30.0f };
-		rotation.Apply(left);
-		wrenchPos += left;
-		subGearModel.SetPosition(wrenchPos);
-		subGearModel.SetRotation(rotation);
-	}
-	break;
-	case Type::Boss:
-		break;
+		hp = 100;
+		status = Status::Normal;
 	}
 }
+
+#pragma endregion
+
+#pragma region 充電
+
 //バックパック更新処理
 void Unit::UpdateBatteryPack()
 {
@@ -589,16 +627,17 @@ void Unit::UpdateBatteryPack()
 	int level = 0;
 
 	//残量判定
-	     if (battery >= 80.0f) { level = 5; }
+	if (battery >= 80.0f) { level = 5; }
 	else if (battery >= 60.0f) { level = 4; }
 	else if (battery >= 40.0f) { level = 3; }
 	else if (battery >= 20.0f) { level = 2; }
-	else if (battery >   0.0f) { level = 1; }
-	else                       { level = 0; }
+	else if (battery > 0.0f) { level = 1; }
+	else { level = 0; }
 	//変更なし
 	if (batteryLevel == level) { return; }
 	batteryLevel = level;
 }
+
 //充電対象検索
 void Unit::SearchChargeTarget()
 {
@@ -613,7 +652,7 @@ void Unit::SearchChargeTarget()
 		//自分自身の除外
 		if (unit == this) { continue; }
 		//停止ユニットまたは電力残量20%以下
-		if (unit->GetStatus() == Status::Stop||unit->GetBattery()<=20.0f)
+		if (unit->GetStatus() == Status::Stop || unit->GetBattery() <= 20.0f)
 		{
 			Vector3 diff = unit->GetPosition() - position;
 			float distSq = diff.LengthSq();
@@ -626,6 +665,7 @@ void Unit::SearchChargeTarget()
 		}
 	}
 }
+
 //充電処理
 void Unit::Charge()
 {
@@ -643,7 +683,7 @@ void Unit::Charge()
 		return;
 	}
 	//充電量
-	float chargeAmount= 10.0f * g_gameTime->GetFrameDeltaTime();
+	float chargeAmount = 10.0f * g_gameTime->GetFrameDeltaTime();
 	//対象へ充電
 	target->battery += chargeAmount;
 	//自身の電力消費
@@ -659,7 +699,7 @@ void Unit::Charge()
 		battery = 0.0f;
 	}
 	//機能停止ユニットの再起動
-	if (target->GetStatus() == Status::Stop && target->battery >= 20.0f)
+	if (target->GetStatus() == Status::Stop && target->battery >= 100.0f)
 	{
 		target->status = Status::Normal;
 		target->stopTimer = 0.0f;
@@ -671,25 +711,53 @@ void Unit::Charge()
 	}
 
 }
+
+//発電機充電処理
+void Unit::ChargeGenerator()
+{
+	//充電
+	battery += 10.0f * g_gameTime->GetFrameDeltaTime();
+
+	//満タン
+	if (battery >= 100.0f)
+	{
+		battery = 100.0f;
+		//通常状態へ戻る
+		status = Status::Normal;
+	}
+}
+
+#pragma endregion
+
+#pragma region 修理
+
+
+#pragma endregion
+
+#pragma region 描画
+
 //描画処理
 void Unit::Render(RenderContext& rc)
 {
-	if (status == Status::Stop){ StopModel.  Draw(rc); } //機能停止ユニット
-	else                       { modelRender.Draw(rc); } //ユニット
-	//充電ユニットのみ
-	if (type == Type::Charger) { batteryPack[batteryLevel].Draw(rc); }
-	else
+	//充電ユニット以外
+	if (type != Type::Charger)
 	{
-		if (type == Type::Basic&&status==Status::Stop)
+		//機能停止モデル
+		if (status == Status::Stop)
 		{
-			//機能停止時の装備
-			stopGearModel.Draw(rc);
-			stopSubGearModel.Draw(rc);
+			StopModel.Draw(rc);
 		}
+		//通常モデル
 		else
 		{
-			if (hasGear) { gearModel.Draw(rc); } //装備
-			if (hasSubGear) { subGearModel.Draw(rc); } //サブ装備
+			modelRender.Draw(rc);
 		}
 	}
+	//充電ユニットのみ描画
+	else
+	{
+		batteryPack[batteryLevel].Draw(rc);
+	}
 }
+
+#pragma endregion

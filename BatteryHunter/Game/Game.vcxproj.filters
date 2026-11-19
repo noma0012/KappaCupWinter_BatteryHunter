@@ -84,16 +84,10 @@
     <ClCompile Include="BulletManager.cpp">
       <Filter>プロジェクト\06_管理</Filter>
     </ClCompile>
-    <ClCompile Include="AttackData.cpp">
-      <Filter>プロジェクト\06_管理</Filter>
-    </ClCompile>
     <ClCompile Include="UnitManager.cpp">
       <Filter>プロジェクト\06_管理</Filter>
     </ClCompile>
     <ClCompile Include="Bullet.cpp">
-      <Filter>プロジェクト\07_その他\01_武器</Filter>
-    </ClCompile>
-    <ClCompile Include="Weapon.cpp">
       <Filter>プロジェクト\07_その他\01_武器</Filter>
     </ClCompile>
     <ClCompile Include="BatteryItem.cpp">
@@ -149,14 +143,8 @@
     <ClInclude Include="BulletManager.h">
       <Filter>プロジェクト\06_管理</Filter>
     </ClInclude>
-    <ClInclude Include="AttackData.h">
-      <Filter>プロジェクト\06_管理</Filter>
-    </ClInclude>
     <ClInclude Include="UnitManager.h">
       <Filter>プロジェクト\06_管理</Filter>
-    </ClInclude>
-    <ClInclude Include="Weapon.h">
-      <Filter>プロジェクト\07_その他\01_武器</Filter>
     </ClInclude>
     <ClInclude Include="Bullet.h">
       <Filter>プロジェクト\07_その他\01_武器</Filter>
